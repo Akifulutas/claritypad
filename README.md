@@ -1,62 +1,51 @@
-# ClarityPad 🖋️📐
+# ClarityPad 🖋️🎙️📐
 
-> **The Apple-grade Math & Markdown Notebook for AI Outputs (ChatGPT, Claude, Gemini, DeepSeek).**  
-> Automatically repairs, normalizes, and renders messy AI formulas, code, and tables into publication-quality notes with live preview and one-click export.
+> **The Apple-grade YouTube Transcript Engine, Zero-Touch Local Recording Watcher & AI Math Notebook.**  
+> Built with 2026 Liquid Glass UI, Anti-AI Slop design principles, and an automated 38-assertion test suite. Instantly parses, repairs, and renders messy AI formulas, multi-video playlists, and local voice memos into publication-quality notes with click-to-seek timestamps and one-click export.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Design: Liquid Glass](https://img.shields.io/badge/Design-Liquid%20Glass%20UI-blueviolet.svg)](design.md)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero%20Build-success.svg)](#features)
 [![Privacy First](https://img.shields.io/badge/Privacy-100%25%20Local-purple.svg)](#privacy)
 
 ---
 
-## 🌟 The Problem ClarityPad Solves
+## 🌟 The Core Mission & Problem ClarityPad Solves
 
-When copying technical explanations, mathematical derivations, or benchmark tables from modern Large Language Models (**ChatGPT**, **Claude**, **Gemini**, **DeepSeek**, etc.):
+When working with technical lectures, research meetings, and outputs from modern Large Language Models (**ChatGPT**, **Claude**, **Gemini**, **DeepSeek**, etc.):
 
-1. **Broken Delimiters**: AI models use inconsistent math delimiters — sometimes `\[...\]`, `\(...\)`, `$$...$$`, `$..$`, or bare raw LaTeX (`\frac{a}{b}`, `\alpha + \beta = \gamma`) with **no delimiters at all**.
-2. **Notes App Incompatibility**: Pasting this into **Apple Notes**, **Notion**, **Obsidian**, or **Slack** results in raw, unreadable TeX junk, mangled brackets, and broken symbols.
-3. **Mangled Tables**: Tables copied from AI responses often paste as tab-separated or space-aligned plain text rather than valid Markdown tables.
-4. **Equation Derivations & Piecewise Cases**: Multi-line equations and `\begin{cases}` environments break across lines or fail to align properly.
-
-**ClarityPad is designed to be the ultimate drop-in clipboard companion for AI outputs.** Paste anything into the editor; ClarityPad’s intelligent preprocessing engine automatically detects, repairs, and renders it in real time.
+1. **Passive Dashboards vs Action-Oriented Feedback**: Generic tools show passive counters ("Total 31 videos") instead of immediately actionable telemetry ("29 Successful, 2 Failed Videos -> Retry / Update Cookies").
+2. **Manual Ingestion Friction**: Users waste time manually uploading audio files or pasting links one by one. ClarityPad watches your local recording directory (`~/Recordings`) in the background and ingests clipboard playlists with zero clicks.
+3. **Broken Delimiters & Apple Notes Incompatibility**: AI models output bare LaTeX (`\frac{a}{b}`, `\operatorname{softmax}`) with no delimiters, causing Apple Notes, Notion, and Slack to render unreadable TeX junk.
+4. **Mangled Tables & Pieces**: Multi-column AI benchmark tables and `\begin{cases}` piecewise equations collapse into messy plain text.
 
 ---
 
-## ✨ Key Features
+## ✨ Key Features & 2026 Architectural Innovations
 
+- 🎙️ **Zero-Touch Local Recording Watcher**:
+  - Automatically monitors local audio/video folders (`~/Recordings`, Voice Memos, OBS, QuickTime).
+  - Background audio ingestion with zero manual clicks and immediate transcript generation.
+- ▶️ **31-Item YouTube Batch Transcript Engine**:
+  - Full playlist ingestion with actionable error handling (Cookie Fallback for age-restricted or member-only videos).
+- 💎 **Liquid Glass UI (Sıvı Cam)**:
+  - Strict $H/2$ capsule geometry (`border-radius: 9999px` on all buttons and pills).
+  - Ultra-thin material physics: `backdrop-filter: blur(28px) saturate(190%)` with 1px specular light border glow.
+  - Asymmetric Hero with two floating live telemetry cards.
+- 📐 **Zorunlu 8 Durum Matrisi (The 8-State Matrix)**:
+  - Interactive coverage for **Empty**, **Loading**, **Success**, **Error (Actionable Retry)**, **No Results**, **Disabled**, **Confirmation (5s Undo)**, and **Recovery**.
+- ⏱️ **Interactive Click-to-Seek Timestamps**:
+  - Click any timestamp (`00:14`, `01:05`) to jump to that moment, highlight the sentence, and sync audio scrubbing.
 - 🧠 **Smart AI Math Auto-Detection**:
-  - Automatically wraps bare LaTeX commands (`\alpha`, `\frac`, `\sum`, `\int`, `\operatorname{softmax}`, etc.) in proper math blocks.
+  - Automatically wraps bare LaTeX commands (`\alpha`, `\frac`, `\sum`, `\operatorname{Attention}`, etc.) in proper math blocks.
   - Balances norms `||x - y|| <= ||x|| + ||y||` into proper `\lVert` and `\rVert` notation.
-  - Intelligently separates currency prices (`$15.50 and $3.00`) from inline math formulas.
-  - Formats piecewise `\begin{cases}` into clean LaTeX arrays.
-  - Translates unicode mathematical symbols (`→`, `←`, `≥`, `≤`, `≠`, `≈`, `∞`, `·`, `×`) into standard TeX.
-- 📊 **Table Auto-Converter**:
-  - Converts tab-separated or multi-space column data (from 2 to 50+ columns) directly into GFM Markdown tables.
-- 🍏 **Apple-Grade Aesthetic**:
-  - macOS Sonoma/Ventura glassmorphism styling, SF Pro typography, and polished micro-interactions.
-  - Light and Dark modes with automatic OS system preference detection (`prefers-color-scheme`).
-- ⚡ **Dual-Pane Synchronized Scrolling**:
-  - Smooth, jitter-free scroll synchronization between the Markdown editor and preview pane.
-- 📖 **Reader Mode**:
-  - One-click collapse of the editor for a full-width, distraction-free reading experience.
-- ⌨️ **Developer-Friendly Keyboard Shortcuts**:
-  - `Tab`: Indent 2 spaces (Shift+Tab unindents).
-  - `Cmd / Ctrl + S`: Instant manual save confirmation.
-  - `Cmd / Ctrl + Enter`: Force re-render preview.
-  - `Cmd / Ctrl + E`: Toggle Reader Mode.
-  - `Cmd / Ctrl + B`: Wrap selection in `**bold**`.
-  - `Cmd / Ctrl + I`: Wrap selection in `*italic*`.
-  - `Cmd / Ctrl + M`: Wrap selection in `$math$`.
-- 📋 **Code Snippets with Syntax Header & One-Click Copy**:
-  - Code blocks include a language indicator badge and an instant "Copy" button.
-- 📤 **One-Click Exports**:
-  - **Copy Cleaned Markdown**: Exports standard, cleaned GitHub Flavored Markdown with proper `$$` and `$` delimiters.
-  - **Download Markdown (`.md`)**: Save the note directly to your filesystem.
-  - **Copy Preview HTML**: Copy the rendered HTML markup.
-  - **Download Standalone HTML**: Exports an offline HTML file with embedded styling and MathJax.
-  - **Print / PDF**: Custom print stylesheet hides editor controls and formats the preview for paper/PDF.
-- 🔒 **100% Private & Local**:
-  - Zero server calls, zero telemetry. All text is stored locally in your browser's `localStorage`.
+  - Intelligently isolates currency amounts (`$15.50 and $3.00`) from math formulas.
+- ⌨️ **macOS Ergonomics & Keyboard Shortcuts**:
+  - `Cmd / Ctrl + K`: Floating Command Palette.
+  - `Cmd / Ctrl + V`: Zero-touch clipboard ingestion.
+  - `Cmd / Ctrl + S`: Instant local save confirmation.
+  - `Cmd / Ctrl + Shift + C`: Copy clean GFM Markdown.
+  - `Tab` / `Shift + Tab`: Code & note indentation.
 
 ---
 

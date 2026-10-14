@@ -250,6 +250,33 @@ function runAllTests(htmlFilePath) {
   test("Markdown download feature is implemented", html.includes("downloadMarkdown"));
   test("Tab key indentation support in textarea", html.includes("keydown") && (html.includes("Tab") || html.includes("key === 'Tab'")));
 
+  // --- SUITE 12: 2026 Liquid Glass UI & 8-State Matrix Architecture ---
+  console.log(`\n[Suite 12: Liquid Glass UI, 8-State Matrix & Anti-AI Slop Rules]`);
+  test("Liquid Glass class with backdrop-filter blur and specular border is defined",
+    html.includes("liquid-glass") && html.includes("backdrop-filter: blur") && html.includes("var(--glass-border-specular)")
+  );
+  test("H/2 capsule geometry (border-radius: 9999px) is applied",
+    html.includes("border-radius: 9999px")
+  );
+  test("Zero-touch watcher telemetry and monitored path are present",
+    html.includes("watcher-pill") && html.includes("~/Recordings")
+  );
+  test("Action-oriented error handling with retry & cookie feedback is present",
+    html.includes("FAILED: İndirilemedi") && html.includes("Yeniden Dene")
+  );
+  test("Zorunlu 8 Durum Matrisi (8-State Matrix) controller is present",
+    html.includes("triggerState") && html.includes("1. Empty") && html.includes("7. Confirmation (Undo)")
+  );
+  test("Asymmetric hero contains 2 overlapping floating telemetry cards",
+    html.includes("floating-snippet") && html.includes("snippet-watcher") && html.includes("snippet-batch")
+  );
+  test("Command+K floating palette is implemented",
+    html.includes("toggleCommandPalette") && html.includes("cmd-backdrop")
+  );
+  test("5-second Undo confirmation toast mechanism is implemented",
+    html.includes("undo-toast") && html.includes("Geri Al (5s)")
+  );
+
   console.log(`\n======================================================`);
   console.log(`TEST SUMMARY: TOTAL: ${passed + failed} | PASSED: ${passed} | FAILED: ${failed}`);
   console.log(`======================================================\n`);

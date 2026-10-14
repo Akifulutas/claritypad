@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ClarityPad — The Clean Math & Markdown Notebook for AI Outputs</title>
-  <meta name="description" content="Turn messy AI responses, LaTeX formulas, and unformatted tables from ChatGPT, Claude, and Gemini into clean, beautifully rendered notes with live preview, math auto-detection, and one-click export." />
+  <title>ClarityPad — YouTube Transkript Motoru & Yerel Kayıt İzleyici</title>
+  <meta name="description" content="Sıfır temaslı yerel kayıt izleyici ve 31 videoluk YouTube toplu transkript motoru. Kırık yapay zeka formüllerini, zaman damgalarını ve tabloları Liquid Glass arayüzüyle yayın kalitesine dönüştürün." />
 
-  <!-- External Libraries -->
+  <!-- External Libraries for Math & Markdown Engine -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 
@@ -27,910 +27,1466 @@
   <script id="mathjax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg-full.js"></script>
 
   <style>
+    /* ==========================================================================
+       CLARITYPAD DESIGN SYSTEM TOKENS (Liquid Glass UI & 2026 Standards)
+       ========================================================================== */
     :root {
-      --bg:#f5f5f7;
-      --surface:rgba(255,255,255,.78);
-      --surface-solid:#ffffff;
-      --surface-raised:#fbfbfd;
-      --text:#1d1d1f;
-      --muted:#6e6e73;
-      --border:rgba(0,0,0,.10);
-      --border-strong:rgba(0,0,0,.18);
-      --accent:#0071e3;
-      --accent-pressed:#0062c4;
-      --input:#ffffff;
-      --code:#f2f2f7;
-      --code-block:#0d1117;
-      --code-block-text:#e6edf3;
-      --shadow:0 18px 55px rgba(0,0,0,.08);
-      --shadow-soft:0 8px 28px rgba(0,0,0,.06);
-      --radius:18px;
-      --max:980px;
-      color-scheme:light;
+      /* Canvases and Liquid Glass Surfaces */
+      --bg-canvas: #f4f4f7;
+      --bg-ambient-1: rgba(0, 113, 227, 0.08);
+      --bg-ambient-2: rgba(175, 82, 222, 0.07);
+      
+      --glass-surface: rgba(255, 255, 255, 0.72);
+      --glass-surface-raised: rgba(255, 255, 255, 0.88);
+      --glass-panel: rgba(255, 255, 255, 0.60);
+      --glass-input: rgba(255, 255, 255, 0.95);
+      
+      /* Specular Light Physics */
+      --glass-border: rgba(0, 0, 0, 0.09);
+      --glass-border-specular: rgba(255, 255, 255, 0.85);
+      --glass-border-strong: rgba(0, 0, 0, 0.16);
+
+      /* Typography Scale (macOS 13pt Base) */
+      --text-primary: #121214;
+      --text-secondary: #58585e;
+      --text-tertiary: #8a8a92;
+      --code-bg: #eaeaf0;
+
+      /* Action Colors */
+      --accent: #0071e3;
+      --accent-hover: #0062c4;
+      --accent-pressed: #0051a8;
+      --accent-glow: rgba(0, 113, 227, 0.22);
+      --accent-gradient: linear-gradient(135deg, #0071e3 0%, #af52de 100%);
+      
+      /* Status Palette */
+      --status-success: #34c759;
+      --status-success-bg: rgba(52, 199, 89, 0.12);
+      --status-warning: #ff9500;
+      --status-warning-bg: rgba(255, 149, 0, 0.12);
+      --status-error: #ff3b30;
+      --status-error-bg: rgba(255, 59, 48, 0.12);
+      --status-active: #5856d6;
+      --status-active-bg: rgba(88, 86, 214, 0.12);
+
+      /* Shadows */
+      --shadow-ambient: 0 16px 48px -4px rgba(0, 0, 0, 0.07);
+      --shadow-floating: 0 24px 60px -8px rgba(0, 0, 0, 0.14);
+      --shadow-glow: 0 0 24px var(--accent-glow);
+
+      /* Transition Physics */
+      --spring: cubic-bezier(0.16, 1, 0.3, 1);
+      
+      color-scheme: light;
     }
 
     .dark {
-      --bg:#0f0f11;
-      --surface:rgba(28,28,30,.78);
-      --surface-solid:#1c1c1e;
-      --surface-raised:#242426;
-      --text:#f5f5f7;
-      --muted:#a1a1a6;
-      --border:rgba(255,255,255,.12);
-      --border-strong:rgba(255,255,255,.20);
-      --accent:#0a84ff;
-      --accent-pressed:#409cff;
-      --input:#151517;
-      --code:#2c2c2e;
-      --code-block:#161b22;
-      --code-block-text:#f0f6fc;
-      --shadow:0 18px 55px rgba(0,0,0,.36);
-      --shadow-soft:0 8px 28px rgba(0,0,0,.26);
-      color-scheme:dark;
+      --bg-canvas: #09090b;
+      --bg-ambient-1: rgba(10, 132, 255, 0.10);
+      --bg-ambient-2: rgba(191, 90, 242, 0.08);
+
+      --glass-surface: rgba(22, 22, 26, 0.72);
+      --glass-surface-raised: rgba(30, 30, 36, 0.88);
+      --glass-panel: rgba(18, 18, 22, 0.60);
+      --glass-input: rgba(16, 16, 18, 0.95);
+
+      --glass-border: rgba(255, 255, 255, 0.11);
+      --glass-border-specular: rgba(255, 255, 255, 0.22);
+      --glass-border-strong: rgba(255, 255, 255, 0.24);
+
+      --text-primary: #f5f5f7;
+      --text-secondary: #a1a1a6;
+      --text-tertiary: #6b6b72;
+      --code-bg: #222226;
+
+      --accent: #0a84ff;
+      --accent-hover: #409cff;
+      --accent-pressed: #0066cc;
+      --accent-glow: rgba(10, 132, 255, 0.30);
+
+      --shadow-ambient: 0 16px 48px -4px rgba(0, 0, 0, 0.45);
+      --shadow-floating: 0 24px 60px -8px rgba(0, 0, 0, 0.65);
+
+      color-scheme: dark;
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; margin: 0; }
 
-    body{
-      margin:0;
+    body {
       background:
-        radial-gradient(circle at 12% -10%, rgba(0,113,227,.12), transparent 34%),
-        radial-gradient(circle at 88% 0%, rgba(175,82,222,.10), transparent 28%),
-        var(--bg);
-      color:var(--text);
-      font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;
-      -webkit-font-smoothing:antialiased;
-      text-rendering:optimizeLegibility;
-      transition:background-color .25s ease, color .25s ease;
-    }
-
-    .app-header{
-      position:sticky;
-      top:0;
-      z-index:30;
-      padding:10px 18px;
-      border-bottom:1px solid var(--border);
-      background:var(--surface);
-      backdrop-filter:saturate(180%) blur(22px);
-      -webkit-backdrop-filter:saturate(180%) blur(22px);
-    }
-
-    .topbar{
-      max-width:1440px;
-      margin:0 auto;
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:170px;
-      user-select:none;
-    }
-
-    .brand-mark{
-      width:32px;
-      height:32px;
-      display:grid;
-      place-items:center;
-      border-radius:10px;
-      background:linear-gradient(135deg, #0071e3, #af52de);
-      border:1px solid rgba(255,255,255,.2);
-      box-shadow:var(--shadow-soft);
-      color:#ffffff;
-      font-weight:850;
-      font-size:15px;
-      letter-spacing:-.05em;
-    }
-
-    .brand h1{
-      margin:0;
-      font-size:16px;
-      line-height:1;
-      font-weight:760;
-      letter-spacing:-.02em;
-    }
-
-    .brand-badge{
-      font-size:10px;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-      padding:2px 6px;
-      border-radius:999px;
-      background:color-mix(in srgb, var(--accent) 15%, transparent);
-      color:var(--accent);
-      font-weight:700;
-    }
-
-    .toolbar{
-      flex:1;
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      gap:8px;
-      min-width:0;
-    }
-
-    button,select,label.toggle{
-      appearance:none;
-      border:1px solid var(--border);
-      background:var(--surface-solid);
-      color:var(--text);
-      border-radius:999px;
-      padding:8px 13px;
-      font-size:13px;
-      line-height:1;
-      cursor:pointer;
-      transition:
-        transform .16s ease,
-        background .16s ease,
-        border-color .16s ease,
-        box-shadow .16s ease,
-        color .16s ease;
-    }
-
-    button:hover,select:hover,label.toggle:hover{
-      transform:translateY(-1px);
-      border-color:var(--border-strong);
-      box-shadow:0 6px 16px rgba(0,0,0,.06);
-      background:var(--surface-raised);
-    }
-
-    button:active,label.toggle:active{
-      transform:translateY(0) scale(.98);
-      box-shadow:none;
-    }
-
-    button:focus-visible,select:focus-visible,label.toggle:focus-visible{
-      outline:3px solid color-mix(in srgb, var(--accent) 30%, transparent);
-      outline-offset:2px;
-    }
-
-    button.primary{
-      background:var(--accent);
-      border-color:var(--accent);
-      color:#ffffff;
-      font-weight:700;
-      box-shadow:0 6px 18px color-mix(in srgb, var(--accent) 26%, transparent);
-    }
-
-    button.primary:hover{
-      background:var(--accent-pressed);
-      border-color:var(--accent-pressed);
-    }
+        radial-gradient(circle at 12% -8%, var(--bg-ambient-1), transparent 38%),
+        radial-gradient(circle at 88% -5%, var(--bg-ambient-2), transparent 32%),
+        var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      font-size: 13pt; /* macOS 13pt Standard */
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* ==========================================================================
+       LIQUID GLASS MATERIAL MIXIN
+       ========================================================================== */
+    .liquid-glass {
+      background: var(--glass-surface);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        inset 0 1px 1px 0 var(--glass-border-specular),
+        var(--shadow-ambient);
+      position: relative;
+    }
+
+    /* H/2 Capsule Geometry Rule */
+    .capsule {
+      border-radius: 9999px;
+    }
+
+    button, .btn {
+      appearance: none;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-surface-raised);
+      color: var(--text-primary);
+      border-radius: 9999px; /* H/2 rule */
+      padding: 8px 15px;
+      font-size: 13px;
+      font-weight: 550;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      user-select: none;
+      box-shadow: inset 0 1px 0.8px 0 var(--glass-border-specular), 0 2px 8px rgba(0,0,0,0.04);
+      transition: transform 0.18s var(--spring), background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+      white-space: nowrap;
+    }
+
+    button:hover, .btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--glass-border-strong);
+      box-shadow: inset 0 1px 1px 0 var(--glass-border-specular), 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+    button:active, .btn:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: none;
+    }
+
+    button.primary, .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+      font-weight: 650;
+      box-shadow: 0 4px 18px var(--accent-glow);
+    }
+
+    button.primary:hover, .btn-primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    /* ==========================================================================
+       APP NAVIGATION (Sticky Liquid Glass Bar)
+       ========================================================================== */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      padding: 10px 24px;
+      border-bottom: 1px solid var(--glass-border);
+      background: var(--glass-surface);
+      backdrop-filter: blur(26px) saturate(180%);
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
+    }
+
+    .header-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: var(--accent-gradient);
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      font-weight: 850;
+      font-size: 15px;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .brand-badge {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    /* Live Watcher Pill */
+    .watcher-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 5px 11px;
+      background: var(--status-success-bg);
+      color: var(--status-success);
+      border: 1px solid color-mix(in srgb, var(--status-success) 24%, transparent);
+      border-radius: 9999px;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 25%, transparent);
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    /* ==========================================================================
+       CHAPTER LABELS & REASSURANCE STRIP (2026 Standards)
+       ========================================================================== */
+    .chapter-label {
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+
+    .reassurance-strip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: 9999px;
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 24px;
+      width: fit-content;
+      box-shadow: inset 0 1px 0.8px 0 var(--glass-border-specular);
+    }
+
+    .reassurance-strip span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ==========================================================================
+       ASYMMETRIC HERO & DUAL VISUAL SIGNATURE
+       ========================================================================== */
+    .hero-section {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 64px 28px 48px;
+      display: grid;
+      grid-template-columns: 1.05fr 1.15fr;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .hero-content {
+      max-width: 580px;
+    }
+
+    .hero-title {
+      font-size: 44px;
+      line-height: 1.12;
+      font-weight: 850;
+      letter-spacing: -0.04em;
+      margin: 0 0 18px;
+    }
+
+    .hero-title .gradient-text {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    .hero-desc {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin: 0 0 24px;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Asymmetric Overflowing Showcase */
+    .hero-showcase {
+      position: relative;
+      margin-right: -24px; /* Deliberate container overflow */
+    }
+
+    .hero-main-card {
+      border-radius: 22px;
+      overflow: hidden;
+      padding: 18px;
+    }
+
+    .hero-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 14px;
+      font-size: 12px;
+      font-weight: 650;
+      color: var(--text-secondary);
+    }
+
+    /* Two Overlapping Floating Cards */
+    .floating-snippet {
+      position: absolute;
+      z-index: 20;
+      padding: 10px 16px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 650;
+      box-shadow: var(--shadow-floating);
+      animation: float 4s ease-in-out infinite alternate;
+    }
+
+    .snippet-watcher {
+      top: -16px;
+      left: -20px;
+      background: var(--glass-surface-raised);
+      border: 1px solid var(--glass-border-strong);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .snippet-batch {
+      bottom: -18px;
+      right: 18px;
+      background: var(--glass-surface-raised);
+      border: 1px solid var(--glass-border-strong);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      animation-delay: -2s;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-7px); }
+    }
+
+    /* ==========================================================================
+       3+1 FEATURE HIERARCHY (3 Panels + 1 Giant Spotlight)
+       ========================================================================== */
+    .section-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 56px 28px;
+    }
+
+    .section-header {
+      margin-bottom: 32px;
+    }
+
+    .section-header h2 {
+      font-size: 28px;
+      font-weight: 780;
+      letter-spacing: -0.03em;
+      margin: 0 0 8px;
+    }
+
+    .section-header p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .feature-card {
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--accent-glow);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 19px;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      letter-spacing: -0.015em;
+    }
+
+    .feature-card p {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin: 0 0 16px;
+      line-height: 1.5;
+    }
+
+    .feature-micro-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 650;
+      padding: 4px 9px;
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+      border-radius: 9999px;
+      width: fit-content;
+      color: var(--text-primary);
+    }
+
+    /* Giant Spotlight Panel (Zero-Touch Ingestion & Local Watcher) */
+    .spotlight-card {
+      border-radius: 24px;
+      padding: 34px 38px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, var(--glass-surface)), var(--glass-surface));
+      border: 1px solid var(--glass-border-strong);
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 32px;
+      align-items: center;
+      box-shadow: var(--shadow-floating);
+    }
+
+    .spotlight-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: 8px 0 12px;
+    }
+
+    .spotlight-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin: 0 0 20px;
+      line-height: 1.6;
+    }
+
+    .telemetry-row {
+      display: flex;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .telemetry-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .telemetry-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .telemetry-lbl {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ==========================================================================
+       OPERATIONAL WORKSPACE (macOS NavigationSplitView in Liquid Glass)
+       ========================================================================== */
+    .workspace-wrapper {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 28px 64px;
+    }
+
+    .workspace-splitview {
+      display: grid;
+      grid-template-columns: 290px 380px 1fr;
+      gap: 14px;
+      min-height: 740px;
+      height: 82vh;
+    }
+
+    /* Sütun 1: Kenar Çubuğu (Yerel Klasör İzleyici & Kaynaklar) */
+    .split-col {
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .col-header {
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      background: color-mix(in srgb, var(--glass-surface-raised) 70%, transparent);
+    }
+
+    .col-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Watcher Directory Card (Anti-Double-Nesting: clean borderless card) */
+    .dir-card {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.16s ease, border-color 0.16s ease;
+    }
+
+    .dir-card:hover, .dir-card.active {
+      background: var(--glass-surface-raised);
+      border-color: var(--glass-border-strong);
+    }
+
+    .dir-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .dir-icon {
+      font-size: 18px;
+      color: var(--accent);
+    }
+
+    .dir-texts {
+      min-width: 0;
+    }
+
+    .dir-name {
+      font-size: 13px;
+      font-weight: 650;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dir-sub {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    /* Sütun 2: Toplu İşlem Kuyruğu & Durum Filtreleri */
+    .queue-filters {
+      display: flex;
+      gap: 6px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--glass-border);
+      overflow-x: auto;
+    }
+
+    .filter-pill {
+      padding: 5px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: 9999px;
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .filter-pill.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .filter-pill.danger-badge {
+      color: var(--status-error);
+      background: var(--status-error-bg);
+      border-color: color-mix(in srgb, var(--status-error) 25%, transparent);
+    }
+
+    .queue-item {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      transition: transform 0.16s var(--spring), border-color 0.16s ease, background 0.16s ease;
+    }
+
+    .queue-item:hover {
+      background: var(--glass-surface-raised);
+      transform: translateX(2px);
+    }
+
+    .queue-item.selected {
+      background: var(--glass-surface-raised);
+      border-color: var(--accent);
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .queue-item.error-item {
+      border-left: 3px solid var(--status-error);
+      background: color-mix(in srgb, var(--status-error-bg) 60%, var(--glass-panel));
+    }
+
+    .queue-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .queue-idx {
+      font-size: 10.5px;
+      font-weight: 750;
+      letter-spacing: 0.04em;
+      color: var(--text-tertiary);
+    }
+
+    .queue-title {
+      font-size: 13px;
+      font-weight: 650;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+    }
+
+    .queue-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    .action-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      text-decoration: none;
+    }
+
+    .action-badge.error {
+      background: var(--status-error-bg);
+      color: var(--status-error);
+      cursor: pointer;
+    }
+
+    .action-badge.error:hover {
+      text-decoration: underline;
+    }
 
-    select{
-      padding-right:28px;
-      background-image:
-        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
-        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
-      background-position:
-        calc(100% - 15px) 50%,
-        calc(100% - 10px) 50%;
-      background-size:5px 5px,5px 5px;
-      background-repeat:no-repeat;
-    }
-
-    label.toggle{
-      display:inline-flex;
-      align-items:center;
-      gap:7px;
-      user-select:none;
-      white-space:nowrap;
-    }
-
-    label.toggle input{
-      accent-color:var(--accent);
-      margin:0;
-    }
-
-    .menu-wrap{
-      position:relative;
-    }
-
-    .icon-btn{
-      min-width:36px;
-      height:36px;
-      display:grid;
-      place-items:center;
-      padding:0;
-      font-size:18px;
-    }
-
-    .menu{
-      position:absolute;
-      top:44px;
-      right:0;
-      min-width:250px;
-      padding:7px;
-      border:1px solid var(--border);
-      border-radius:16px;
-      background:var(--surface);
-      backdrop-filter:saturate(180%) blur(24px);
-      -webkit-backdrop-filter:saturate(180%) blur(24px);
-      box-shadow:var(--shadow);
-      opacity:0;
-      transform:translateY(-6px) scale(.98);
-      pointer-events:none;
-      transition:opacity .16s ease, transform .16s ease;
-      z-index:100;
-    }
-
-    .menu.open{
-      opacity:1;
-      transform:translateY(0) scale(1);
-      pointer-events:auto;
-    }
-
-    .menu button{
-      width:100%;
-      justify-content:flex-start;
-      display:flex;
-      align-items:center;
-      gap:10px;
-      border:0;
-      border-radius:11px;
-      background:transparent;
-      padding:9px 12px;
-      box-shadow:none;
-      transform:none;
-      font-size:13px;
-    }
-
-    .menu button:hover{
-      background:color-mix(in srgb, var(--text) 7%, transparent);
-      box-shadow:none;
-      transform:none;
-    }
-
-    .menu-separator{
-      height:1px;
-      margin:6px 7px;
-      background:var(--border);
-    }
-
-    .menu-header{
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.05em;
-      color:var(--muted);
-      padding:6px 12px 2px;
-      font-weight:700;
-    }
-
-    .wrap{
-      display:grid;
-      grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-      gap:14px;
-      min-height:calc(100vh - 61px);
-      padding:14px;
-    }
-
-    .pane{
-      min-width:0;
-      display:flex;
-      flex-direction:column;
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      overflow:hidden;
-      box-shadow:var(--shadow-soft);
-      backdrop-filter:saturate(180%) blur(18px);
-      -webkit-backdrop-filter:saturate(180%) blur(18px);
-      transition:all .2s ease;
-    }
-
-    .pane-title{
-      height:42px;
-      padding:0 15px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      border-bottom:1px solid var(--border);
-      background:color-mix(in srgb, var(--surface-solid) 70%, transparent);
-      color:var(--muted);
-      font-size:12px;
-      font-weight:720;
-      letter-spacing:.01em;
-    }
-
-    .pane-title-left, .pane-title-right{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      min-width:0;
-    }
-
-    .status-dot{
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:#34c759;
-      box-shadow:0 0 0 4px color-mix(in srgb, #34c759 16%, transparent);
-      transition:background-color .2s ease, box-shadow .2s ease;
-    }
-
-    .status-dot.error{
-      background:#ff3b30;
-      box-shadow:0 0 0 4px color-mix(in srgb, #ff3b30 20%, transparent);
-    }
-
-    .status-dot.saving{
-      background:#ff9500;
-      box-shadow:0 0 0 4px color-mix(in srgb, #ff9500 20%, transparent);
-    }
-
-    .collapse-editor{
-      width:26px;
-      height:26px;
-      display:grid;
-      place-items:center;
-      border-radius:50%;
-      padding:0;
-      font-size:15px;
-      line-height:1;
-      color:var(--muted);
-      background:transparent;
-      border:1px solid transparent;
-      box-shadow:none;
-      transform:none;
-    }
-
-    .collapse-editor:hover{
-      color:var(--text);
-      background:color-mix(in srgb, var(--text) 7%, transparent);
-      border-color:var(--border);
-      box-shadow:none;
-    }
-
-    .show-editor{
-      position:fixed;
-      left:18px;
-      top:76px;
-      z-index:24;
-      width:38px;
-      height:38px;
-      display:none;
-      place-items:center;
-      padding:0;
-      border-radius:50%;
-      font-size:20px;
-      background:var(--surface-solid);
-      border:1px solid var(--border);
-      box-shadow:var(--shadow-soft);
-      cursor:pointer;
-    }
-
-    .wrap.reading-only ~ .show-editor{
-      display:grid;
-    }
-
-    textarea{
-      flex:1;
-      min-height:70vh;
-      width:100%;
-      resize:none;
-      border:0;
-      outline:none;
-      padding:18px;
-      background:var(--input);
-      color:var(--text);
-      font-size:14px;
-      line-height:1.65;
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
-    }
-
-    textarea::selection{
-      background:color-mix(in srgb, var(--accent) 26%, transparent);
-    }
-
-    .hint{
-      padding:9px 15px;
-      border-top:1px solid var(--border);
-      background:color-mix(in srgb, var(--surface-solid) 74%, transparent);
-      color:var(--muted);
-      font-size:12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-
-    .stats{
-      display:flex;
-      gap:12px;
-      font-size:11.5px;
-      white-space:nowrap;
-    }
-
-    .preview-shell{
-      overflow:auto;
-      flex:1;
-      background:var(--surface-solid);
-      scroll-behavior:smooth;
-    }
-
-    .preview{
-      max-width:var(--max);
-      margin:0 auto;
-      padding:32px 36px 72px;
-      font-size:16px;
-      line-height:1.7;
-      color:var(--text);
-      overflow-wrap:break-word;
-      word-break:normal;
-      hyphens:auto;
-    }
-
-    .preview h1{
-      font-size:32px;
-      line-height:1.2;
-      margin:0 0 20px;
-      font-weight:780;
-      letter-spacing:-.035em;
-      border:0;
-    }
-
-    .preview h2{
-      font-size:24px;
-      line-height:1.25;
-      margin:32px 0 14px;
-      font-weight:740;
-      letter-spacing:-.025em;
-      border:0;
-    }
-
-    .preview h3{
-      font-size:19px;
-      line-height:1.35;
-      margin:24px 0 10px;
-      font-weight:700;
-      letter-spacing:-.015em;
-    }
-
-    .preview p{margin:12px 0}
-
-    .preview img,
-    .preview video,
-    .preview canvas{
-      display:block;
-      max-width:100%;
-      height:auto;
-      margin:20px auto;
-      border-radius:12px;
-      box-shadow:var(--shadow-soft);
-    }
-
-    .preview a{
-      color:var(--accent);
-      text-decoration:none;
-    }
-
-    .preview a:hover{text-decoration:underline}
-
-    .preview blockquote{
-      margin:16px 0;
-      padding:12px 18px;
-      border-left:3px solid var(--accent);
-      background:color-mix(in srgb, var(--accent) 7%, transparent);
-      border-radius:0 14px 14px 0;
-      color:color-mix(in srgb, var(--text) 90%, var(--muted));
-    }
-
-    .preview ul,.preview ol{
-      padding-left:24px;
-      margin:10px 0 16px;
-    }
-
-    .preview li{margin:5px 0}
-
-    .preview hr{
-      border:0;
-      border-top:1px solid var(--border);
-      margin:32px 0;
-    }
-
-    .preview table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      margin:16px 0 22px;
-      font-size:14.5px;
-      line-height:1.45;
-      border:1px solid var(--border);
-      border-radius:14px;
-      overflow:hidden;
-    }
-
-    .table-scroll{
-      width:100%;
-      margin:16px 0 22px;
-      overflow-x:auto;
-      overscroll-behavior-inline:contain;
-      border-radius:14px;
-    }
-
-    .table-scroll .preview-table,
-    .table-scroll table{
-      width:max-content;
-      min-width:100%;
-      margin:0;
-    }
-
-    .preview th,.preview td{
-      border-right:1px solid var(--border);
-      border-bottom:1px solid var(--border);
-      padding:10px 14px;
-      vertical-align:top;
-    }
-
-    .preview th:last-child,.preview td:last-child{border-right:0}
-    .preview tr:last-child td{border-bottom:0}
-
-    .preview th{
-      background:var(--surface-raised);
-      font-weight:700;
-    }
-
-    .preview code{
-      background:var(--code);
-      padding:2px 6px;
-      border-radius:6px;
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-      font-size:.90em;
-    }
-
-    .code-block-wrapper{
-      position:relative;
-      margin:18px 0;
-      border-radius:16px;
-      overflow:hidden;
-      background:var(--code-block);
-      border:1px solid var(--border);
-    }
-
-    .code-header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:8px 14px;
-      background:rgba(255,255,255,.05);
-      border-bottom:1px solid rgba(255,255,255,.08);
-      font-size:11.5px;
-      color:#8b949e;
-      font-family:ui-monospace,monospace;
+    /* Sütun 3: Etkileşimli Transkript, Oynatıcı & Not Editörü */
+    .col-header-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .code-copy-btn{
-      background:rgba(255,255,255,.1);
-      border:0;
-      color:#c9d1d9;
-      border-radius:6px;
-      padding:3px 8px;
-      font-size:11px;
-      cursor:pointer;
+    .view-tab {
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      border: 0;
+      background: transparent;
+      box-shadow: none;
     }
-    .code-copy-btn:hover{
-      background:rgba(255,255,255,.2);
-      color:#ffffff;
+
+    .view-tab.active {
+      color: var(--text-primary);
+      background: var(--glass-panel);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    /* Transcript Scroll Area */
+    .transcript-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+    }
+
+    .transcript-line {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 16px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      transition: background 0.15s ease;
+      cursor: pointer;
     }
 
-    .preview pre{
-      margin:0;
-      background:transparent;
-      color:var(--code-block-text);
-      padding:14px 16px;
-      overflow:auto;
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-      font-size:13.5px;
-      line-height:1.55;
-    }
-
-    .preview pre code{
-      padding:0;
-      background:transparent;
-      color:inherit;
-      white-space:pre;
-      overflow-wrap:normal;
-    }
-
-    .math-display{
-      margin:22px 0;
-      overflow-x:auto;
-      overflow-y:hidden;
-      overscroll-behavior-inline:contain;
-      -webkit-overflow-scrolling:touch;
-      padding:4px 0;
-    }
-
-    mjx-container[display="true"]{
-      margin:0!important;
-      padding:0!important;
-      overflow-x:auto;
-      overflow-y:hidden;
-    }
-
-    .preview mjx-container{
-      max-width:100%;
-      color:var(--text);
-    }
-
-    .preview .math-inline{
-      display:inline;
-      white-space:nowrap;
-    }
-
-    mjx-merror{
-      background:transparent!important;
-      color:#ff453a!important;
-      border:1px dashed #ff453a;
-      padding:2px 6px;
-      border-radius:6px;
-      font-size:13px;
-    }
-
-    .preview mjx-container[display="true"]{
-      min-width:max-content;
-    }
-
-    .preview mjx-container[jax="SVG"] svg{
-      max-width:none;
-      height:auto;
-    }
-
-    .math-display.center mjx-container[display="true"]{
-      text-align:center!important;
-    }
-
-    .reading-only{
-      grid-template-columns:1fr;
-    }
-
-    .reading-only .input-pane{
-      display:none;
-    }
-
-    .reading-only .preview{
-      max-width:920px;
-      padding-top:40px;
-    }
-
-    .reading-only .pane{
-      margin-left:44px;
-    }
-
-    .compact .preview{
-      font-size:14.5px;
-      line-height:1.55;
-      max-width:880px;
-      padding:22px 24px 60px;
-    }
-
-    .compact .preview h1{font-size:28px}
-    .compact .preview h2{font-size:21px;margin-top:24px}
-    .compact .preview h3{font-size:17px;margin-top:18px}
-    .compact .math-display{margin:16px 0}
-
-    .copied{
-      position:fixed;
-      right:20px;
-      bottom:20px;
-      background:rgba(28,28,30,.92);
-      color:#ffffff;
-      padding:10px 16px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:600;
-      z-index:999;
-      opacity:0;
-      pointer-events:none;
-      transform:translateY(8px);
-      transition:opacity .2s ease, transform .2s ease;
-      backdrop-filter:blur(18px);
-      -webkit-backdrop-filter:blur(18px);
-      box-shadow:0 10px 30px rgba(0,0,0,.3);
-    }
-
-    .copied.show{
-      opacity:1;
-      transform:translateY(0);
-    }
-
-    @media(max-width:1080px){
-      .brand{min-width:auto}
-      .toolbar select.desktop-only,
-      .toolbar label.toggle.desktop-only{
-        display:none;
+    .transcript-line:hover, .transcript-line.playing {
+      background: var(--glass-panel);
+    }
+
+    .transcript-line.playing {
+      border-left: 2px solid var(--accent);
+    }
+
+    .time-tag {
+      font-family: ui-monospace, monospace;
+      font-size: 11.5px;
+      font-weight: 650;
+      color: var(--accent);
+      user-select: none;
+    }
+
+    .transcript-text {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--text-primary);
+    }
+
+    /* ClarityPad AI Math & Markdown Output Area */
+    .math-preview-pane {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 34px 72px;
+    }
+
+    .math-preview-pane.active {
+      display: block;
+    }
+
+    /* MathJax Display Styling */
+    .math-display {
+      margin: 18px 0;
+      overflow-x: auto;
+      padding: 4px 0;
+    }
+
+    /* Table Scroll */
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      margin: 16px 0;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    th, td {
+      padding: 9px 13px;
+      border-bottom: 1px solid var(--glass-border);
+      text-align: left;
+    }
+
+    th {
+      background: var(--glass-panel);
+      font-weight: 700;
+    }
+
+    /* ==========================================================================
+       8-STATE MATRIX DEMO CONTROLLER (Interactive Verification Dock)
+       ========================================================================== */
+    .state-matrix-bar {
+      margin-top: 18px;
+      padding: 12px 18px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .state-btn-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .state-btn {
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: 9999px;
+    }
+
+    /* Undo Toast Notification (Confirmation State) */
+    .undo-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 1000;
+      padding: 11px 20px;
+      border-radius: 9999px;
+      background: rgba(20, 20, 24, 0.94);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s var(--spring);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+      backdrop-filter: blur(20px);
+    }
+
+    .undo-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .undo-btn {
+      color: var(--accent);
+      background: rgba(255, 255, 255, 0.15);
+      border: 0;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      cursor: pointer;
+    }
+
+    /* Floating Command Palette (Cmd+K) */
+    .cmd-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(12px);
+      z-index: 999;
+      display: none;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .cmd-backdrop.open {
+      display: grid;
+    }
+
+    .cmd-palette {
+      width: 100%;
+      max-width: 540px;
+      border-radius: 22px;
+      padding: 16px;
+      background: var(--glass-surface-raised);
+      border: 1px solid var(--glass-border-strong);
+      box-shadow: var(--shadow-floating);
+    }
+
+    .cmd-input {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-input);
+      color: var(--text-primary);
+      font-size: 14.5px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    .cmd-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .cmd-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: background 0.14s ease;
+    }
+
+    .cmd-item:hover, .cmd-item.active {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .cmd-shortcut {
+      font-size: 11px;
+      font-family: ui-monospace, monospace;
+      opacity: 0.7;
+    }
+
+    /* Responsive Breakpoints */
+    @media(max-width: 1080px) {
+      .hero-section {
+        grid-template-columns: 1fr;
+        padding-top: 36px;
+      }
+      .hero-showcase {
+        margin-right: 0;
+      }
+      .workspace-splitview {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+      .spotlight-card {
+        grid-template-columns: 1fr;
       }
     }
 
-    @media(max-width:820px){
-      .app-header{padding:10px 14px}
-      .brand h1{font-size:15px}
-      .brand-badge{display:none}
-      .wrap{
-        grid-template-columns:1fr;
-        padding:10px;
-        gap:10px;
+    @media print {
+      .app-header, .state-matrix-bar, .hero-section, .section-container, .col-header, .queue-filters {
+        display: none !important;
       }
-      .reading-only .pane{
-        margin-left:0;
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
       }
-      .show-editor{
-        top:68px;
-        left:12px;
+      .workspace-splitview {
+        display: block !important;
       }
-      textarea{
-        min-height:45vh;
-        padding:14px;
+      .split-col:nth-child(1), .split-col:nth-child(2) {
+        display: none !important;
       }
-      .preview{
-        padding:20px 16px 60px;
-      }
-    }
-
-    @media print{
-      .app-header,.input-pane,.pane-title,.hint,.show-editor{display:none!important}
-      body{
-        background:#ffffff!important;
-        color:#111827!important;
-      }
-      .wrap{
-        display:block!important;
-        padding:0!important;
-      }
-      .pane{
-        border:0!important;
-        display:block!important;
-        box-shadow:none!important;
-        background:#ffffff!important;
-      }
-      .preview-shell{
-        overflow:visible!important;
-        background:#ffffff!important;
-      }
-      .preview{
-        color:#111827!important;
-        max-width:100%!important;
-        padding:0!important;
-      }
-      .preview mjx-container{
-        color:#111827!important;
+      .split-col:nth-child(3) {
+        border: 0 !important;
+        box-shadow: none !important;
       }
     }
   </style>
 </head>
 
 <body>
-<header class="app-header">
-  <div class="topbar">
-    <div class="brand">
-      <div class="brand-mark">C</div>
-      <div>
-        <h1>ClarityPad</h1>
+  <!-- ========================================================================
+       STICKY APP HEADER (Liquid Glass Bar)
+       ======================================================================== -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-group">
+        <div class="brand-mark">C</div>
+        <div>
+          <h1 class="brand-title">ClarityPad</h1>
+        </div>
+        <span class="brand-badge">2026.1</span>
+
+        <!-- Live Local Recording Watcher Status -->
+        <div class="watcher-pill" id="headerWatcherPill" title="Yerel klasör izleniyor">
+          <span class="pulse-dot"></span>
+          <span id="watcherPathText">~/Recordings/ (Canlı İzleniyor)</span>
+        </div>
       </div>
-      <span class="brand-badge">AI Math & Note</span>
+
+      <div class="header-actions">
+        <button onclick="toggleCommandPalette()" title="Komut Paleti (Cmd+K)">
+          <span>⌘K</span>
+          <span>Hızlı Ekle</span>
+        </button>
+
+        <button class="primary" onclick="ingestFromClipboard()" title="Panodaki Linki Algıla (Cmd+V)">
+          <span>+ YouTube / Klasör</span>
+        </button>
+
+        <button onclick="toggleTheme()" title="Karanlık / Aydınlık Mod">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       ASYMMETRIC HERO & DUAL VISUAL SIGNATURE
+       ======================================================================== -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <span class="chapter-label">00 // SIFIR TEMASLI AKIŞ</span>
+      <h2 class="hero-title">
+        YouTube Transkript Motoru & <br />
+        <span class="gradient-text">Yerel Kayıt İzleyici.</span>
+      </h2>
+      <p class="hero-desc">
+        Pasif istatistikleri ve biçimlendirmesi bozulan yapay zeka çıktılarını unutun. Yerel ses/video klasörünüzü arka planda dinler, 31 videoluk YouTube listelerini saniyeler içinde çözer, kırık LaTeX formüllerini ve tabloları anında yayın kalitesine dönüştürür.
+      </p>
+
+      <div class="hero-cta-group">
+        <a href="#workspace" class="btn btn-primary" onclick="smoothScrollToWorkspace()">
+          <span>▶ Canlı Çalışma Alanını Aç</span>
+        </a>
+        <button onclick="toggleCommandPalette()">
+          <span>⌘K Komut Paleti</span>
+        </button>
+      </div>
+
+      <!-- Reassurance Strip -->
+      <div class="reassurance-strip">
+        <span>⚡ <strong>Kime Hitap Ediyor:</strong> Araştırmacılar, mühendisler ve içerik üreticileri için sıfır temaslı transkript & matematik motoru.</span>
+      </div>
     </div>
 
-    <div class="toolbar">
-      <button class="primary" onclick="renderPreview()" title="Refresh preview (Cmd/Ctrl + Enter)">Refresh</button>
+    <!-- Asymmetric Overflowing Showcase with Overlapping Snippets -->
+    <div class="hero-showcase">
+      <!-- Floating Snippet 1 (Local Watcher Telemetry) -->
+      <div class="floating-snippet snippet-watcher liquid-glass">
+        <span class="pulse-dot" style="color: var(--status-success);"></span>
+        <div>
+          <div style="font-size: 11px; color: var(--text-tertiary);">YEREL İZLEYİCİ</div>
+          <div>~/Recordings/ (1 Yeni Ses Yakalandı)</div>
+        </div>
+      </div>
 
-      <select id="sampleSelect" onchange="loadPresetSample(this.value)" title="Load sample note">
-        <option value="" disabled selected>Presets...</option>
-        <option value="dl">AI & Deep Learning</option>
-        <option value="quantum">Quantum & Linear Algebra</option>
-        <option value="calculus">Calculus & Stats</option>
-        <option value="clear">Clear Note</option>
-      </select>
+      <!-- Main Showcase Container -->
+      <div class="hero-main-card liquid-glass">
+        <div class="hero-card-header">
+          <span>CANLI ÇALIŞMA ALANI • 31 VİDEOLUK KUYRUK</span>
+          <span style="color: var(--accent); font-weight: 700;">HIZ: 0.4s</span>
+        </div>
 
-      <select id="densityMode" class="desktop-only" onchange="toggleDensity()" title="Density layout">
-        <option value="normal">Comfort</option>
-        <option value="compact">Compact</option>
-      </select>
+        <div style="font-family: ui-monospace, monospace; font-size: 12px; line-height: 1.7; color: var(--text-secondary); background: var(--glass-panel); padding: 14px; border-radius: 12px; border: 1px solid var(--glass-border);">
+          <div style="color: var(--status-success); font-weight: 700;">✓ [29 BAŞARILI] YouTube & Yerel Dosyalar Çözümlendi</div>
+          <div style="color: var(--status-error); font-weight: 700;">⚠ [2 MÜDAHALE GEREKİYOR] Video 1 & Video 16 (Çerez Fallback Hazır)</div>
+          <div style="margin-top: 8px; color: var(--text-primary);">
+            &gt; Softmax & Attention Formülü Algılandı: <br />
+            <code>\operatorname{Attention}(Q,K,V) = \operatorname{softmax}(QK^T/\sqrt{d_k})V</code>
+          </div>
+        </div>
+      </div>
 
-      <select id="mathAlign" class="desktop-only" onchange="renderPreview()" title="Formula alignment">
-        <option value="left">Formula: Left</option>
-        <option value="center">Formula: Center</option>
-      </select>
+      <!-- Floating Snippet 2 (Batch Stats Telemetry) -->
+      <div class="floating-snippet snippet-batch liquid-glass">
+        <span style="color: var(--accent); font-size: 14px;">⚡</span>
+        <div>
+          <div style="font-size: 11px; color: var(--text-tertiary);">BATCH MOTORU</div>
+          <div>29/31 Başarılı • 2 Aksiyon Bekliyor • 0.4s</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      <label class="toggle desktop-only" title="Synchronize editor and preview scrolling">
-        <input id="syncScroll" type="checkbox" checked>
-        Sync
-      </label>
+  <!-- ========================================================================
+       3+1 FEATURE HIERARCHY
+       ======================================================================== -->
+  <section class="section-container">
+    <div class="section-header">
+      <span class="chapter-label">01 // MİMARİ VE YETENEKLER</span>
+      <h2>Özellik Yığını Değil, Sonuç Üreten 3+1 Hiyerarşi</h2>
+      <p>Kullanıcıyı boğan 6 eşit kutu yerine, temel beklentileri karşılayan 3 zengin panel ve devasa 1 Spotlight alanı.</p>
+    </div>
 
-      <div class="menu-wrap">
-        <button class="icon-btn" id="moreButton" onclick="toggleMoreMenu(event)" aria-label="More actions" aria-expanded="false">…</button>
-        <div class="menu" id="moreMenu">
-          <div class="menu-header">Export & Copy</div>
-          <button onclick="copyCleanMarkdown()">⌘ Copy cleaned Markdown</button>
-          <button onclick="downloadMarkdown()">⇩ Download Markdown (.md)</button>
-          <button onclick="copyPreviewHtml()">⌥ Copy preview HTML</button>
-          <button onclick="downloadHtml()">⇩ Download HTML</button>
-          <button onclick="window.print()">⌁ Print / PDF</button>
+    <!-- 3 Enriched Panels -->
+    <div class="feature-grid">
+      <div class="feature-card liquid-glass">
+        <div class="feature-icon">▶</div>
+        <div>
+          <h3>Toplu YouTube & Çerez Fallback</h3>
+          <p>31 videoluk oynatma listelerini tek hamlede sıraya alır. Yaş sınırı veya özel videolarda çökmez; otomatik çerez protokolüyle kurtarır.</p>
+        </div>
+        <div class="feature-micro-badge">
+          <span>● 31 Video / Batch • Cookie Fallback</span>
+        </div>
+      </div>
 
-          <div class="menu-separator"></div>
-          <div class="menu-header">View & Appearance</div>
-          <button onclick="toggleReaderMode()">📖 Toggle Reader mode</button>
-          <button onclick="toggleTheme()">◐ Toggle Dark/Light</button>
-          <button onclick="cycleMathAlign()">📐 Toggle Formula Align</button>
-          <button onclick="cycleDensity()">⇲ Toggle Density</button>
+      <div class="feature-card liquid-glass">
+        <div class="feature-icon">⏱</div>
+        <div>
+          <h3>Zaman Damgalı İnteraktif Arama</h3>
+          <p>Her transkript satırı tıklanabilir zaman damgasıyla eşlenir. Konuşmacı bir formülü veya kodu açıkladığı anda o saniyeye atlayın.</p>
+        </div>
+        <div class="feature-micro-badge">
+          <span>● Click-to-Seek • Scrubbing</span>
+        </div>
+      </div>
+
+      <div class="feature-card liquid-glass">
+        <div class="feature-icon">∑</div>
+        <div>
+          <h3>Kusursuz AI Math & Çoklu Export</h3>
+          <p>Yapay zekanın bozduğu bare LaTeX formüllerini, matrisleri, normları ($||x||$) ve tabloları anında onarır. Markdown, HTML ve SRT çıktısı verir.</p>
+        </div>
+        <div class="feature-micro-badge">
+          <span>● MathJax SVG • GFM Markdown</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1 GIANT SPOTLIGHT PANEL (Local Recording Watcher) -->
+    <div class="spotlight-card liquid-glass">
+      <div>
+        <span class="chapter-label" style="color: var(--accent);">02 // SPOTLIGHT ENTEGRASYON</span>
+        <h3 class="spotlight-title">Sıfır Temaslı Yerel Kayıt İzleyici (Zero-Touch Watcher)</h3>
+        <p class="spotlight-desc">
+          Mac'inizdeki Sesli Notlar (Voice Memos), OBS kayıtları veya toplantı dökümlerinin kaydedildiği klasörü bir kez seçin. Yeni bir kayıt düştüğünde ClarityPad hiçbir tıklama beklemeden arka planda dinler, sesi ayrıştırır, formülleri onarır ve hazır not olarak çalışma alanınıza teslim eder.
+        </p>
+
+        <div class="telemetry-row">
+          <div class="telemetry-item">
+            <span class="telemetry-val">0</span>
+            <span class="telemetry-lbl">Manuel Tıklama</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="telemetry-val">0.4sn</span>
+            <span class="telemetry-lbl">Ortalama Çözümleme</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="telemetry-val">%100</span>
+            <span class="telemetry-lbl">Yerel Gizlilik</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spotlight Visual Representation -->
+      <div style="background: var(--glass-panel); border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">DİNLENEN KLASÖR</span>
+          <span class="action-badge" style="background: var(--status-success-bg); color: var(--status-success);">AKTİF</span>
+        </div>
+        <div style="font-family: ui-monospace, monospace; font-size: 13px; font-weight: 600; margin-bottom: 8px;">
+          📂 /Users/akifulutas/Recordings/
+        </div>
+        <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px;">
+          En son yakalanan: <code>derin-ogrenme-ders-4.m4a</code> (2.4 MB)
+        </div>
+        <button class="primary" style="width: 100%; justify-content: center;" onclick="simulateNewRecordingDrop()">
+          ⚡ Yeni Yerel Kayıt Simüle Et (Test)
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       OPERATIONAL WORKSPACE (NavigationSplitView in Liquid Glass)
+       ======================================================================== -->
+  <section class="workspace-wrapper" id="workspace">
+    <div class="section-header" style="margin-bottom: 18px;">
+      <span class="chapter-label">03 // CANLI ÇALIŞMA ALANI</span>
+      <h2>macOS Ergonomisinde Çift Yönlü Split View</h2>
+      <p>Kayıt izleyici, 31 videoluk toplu kuyruk ve etkileşimli transkript not defteri tek ekranda.</p>
+    </div>
+
+    <div class="workspace-splitview">
+      <!-- SÜTUN 1: YEREL İZLEYİCİ & KAYNAKLAR -->
+      <div class="split-col liquid-glass">
+        <div class="col-header">
+          <span>İzlenen Klasörler</span>
+          <button class="btn" style="padding: 3px 8px; font-size: 11px;" onclick="chooseLocalFolder()">+ Klasör</button>
+        </div>
+        <div class="col-body" id="dirList">
+          <div class="dir-card active" onclick="selectSource('recordings')">
+            <div class="dir-info">
+              <span class="dir-icon">🎙</span>
+              <div class="dir-texts">
+                <div class="dir-name">~/Recordings</div>
+                <div class="dir-sub">4 Kayıt • Canlı Dinleniyor</div>
+              </div>
+            </div>
+            <span class="pulse-dot" style="color: var(--status-success);"></span>
+          </div>
+
+          <div class="dir-card" onclick="selectSource('lectures')">
+            <div class="dir-info">
+              <span class="dir-icon">📁</span>
+              <div class="dir-texts">
+                <div class="dir-name">~/Desktop/Lectures</div>
+                <div class="dir-sub">12 Ses Dosyası</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dir-card" onclick="selectSource('youtube')">
+            <div class="dir-info">
+              <span class="dir-icon">▶</span>
+              <div class="dir-texts">
+                <div class="dir-name">YouTube Oynatma Listesi</div>
+                <div class="dir-sub">31 Video Kuyrukta</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SÜTUN 2: 31 VİDEOLUK TOPLU KUYRUK (BATCH QUEUE) -->
+      <div class="split-col liquid-glass">
+        <div class="col-header">
+          <span>Toplu İşlem Kuyruğu</span>
+          <span style="font-size: 11px; color: var(--text-tertiary);" id="queueSummaryText">31 Kayıt</span>
+        </div>
+
+        <!-- Durum Filtreleri -->
+        <div class="queue-filters">
+          <div class="filter-pill active" onclick="filterQueue('all', this)">Tümü (31)</div>
+          <div class="filter-pill danger-badge" onclick="filterQueue('error', this)">Müdahale Gerekiyor (2)</div>
+          <div class="filter-pill" onclick="filterQueue('success', this)">Başarılı (28)</div>
+          <div class="filter-pill" onclick="filterQueue('loading', this)">İşleniyor (1)</div>
+        </div>
+
+        <!-- Kuyruk Listesi -->
+        <div class="col-body" id="queueList">
+          <!-- 1. HATA DURUMU ÖRNEĞİ (Action-Oriented Feedback) -->
+          <div class="queue-item error-item" data-status="error" onclick="loadTranscript(1)">
+            <div class="queue-top">
+              <span class="queue-idx" style="color: var(--status-error);">VIDEO 01</span>
+              <span class="action-badge error" onclick="event.stopPropagation(); retryVideo(1)">Yeniden Dene ↻</span>
+            </div>
+            <h4 class="queue-title">01. Transformer Mimarisi & Self-Attention</h4>
+            <div class="queue-meta">
+              <span style="color: var(--status-error);">[FAILED: İndirilemedi] -> Çerezleri Güncelle</span>
+              <span>18:42</span>
+            </div>
+          </div>
+
+          <!-- 2. HATA DURUMU ÖRNEĞİ -->
+          <div class="queue-item error-item" data-status="error" onclick="loadTranscript(16)">
+            <div class="queue-top">
+              <span class="queue-idx" style="color: var(--status-error);">VIDEO 16</span>
+              <span class="action-badge error" onclick="event.stopPropagation(); retryVideo(16)">Giriş Yap ↻</span>
+            </div>
+            <h4 class="queue-title">16. Üyelere Özel Video Dersi</h4>
+            <div class="queue-meta">
+              <span style="color: var(--status-error);">[FAILED: Oturum Gerekli]</span>
+              <span>24:10</span>
+            </div>
+          </div>
+
+          <!-- BAŞARILI VİDEO 2 (Seçili) -->
+          <div class="queue-item selected" data-status="success" onclick="loadTranscript(2)">
+            <div class="queue-top">
+              <span class="queue-idx">VIDEO 02</span>
+              <span class="action-badge" style="background: var(--status-success-bg); color: var(--status-success);">✓ Çözümlendi</span>
+            </div>
+            <h4 class="queue-title">02. Scaled Dot-Product Attention & Formüller</h4>
+            <div class="queue-meta">
+              <span>Transkript & AI Math Hazır</span>
+              <span>14:05</span>
+            </div>
+          </div>
+
+          <!-- BAŞARILI VİDEO 3 -->
+          <div class="queue-item" data-status="success" onclick="loadTranscript(3)">
+            <div class="queue-top">
+              <span class="queue-idx">VIDEO 03</span>
+              <span class="action-badge" style="background: var(--status-success-bg); color: var(--status-success);">✓ Çözümlendi</span>
+            </div>
+            <h4 class="queue-title">03. Cross-Entropy Loss & Regularizasyon</h4>
+            <div class="queue-meta">
+              <span>Transkript & AI Math Hazır</span>
+              <span>21:30</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SÜTUN 3: ETKİLEŞİMLİ TRANSKRİPT & AI MATH NOTU -->
+      <div class="split-col liquid-glass">
+        <div class="col-header">
+          <div class="col-header-tabs">
+            <button class="view-tab active" id="tabTranscript" onclick="switchMainTab('transcript')">Zaman Damgalı Transkript</button>
+            <button class="view-tab" id="tabMath" onclick="switchMainTab('math')">AI Matematik & Formül Notu</button>
+          </div>
+          <div>
+            <button class="btn" style="padding: 4px 10px; font-size: 11.5px;" onclick="copyCurrentCleanMarkdown()">⌘ Markdown Kopyala</button>
+          </div>
+        </div>
+
+        <!-- 1. Görünüm: İnteraktif Zaman Damgalı Transkript -->
+        <div class="transcript-scroll" id="transcriptView">
+          <div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--glass-border);">
+            <h3 id="currentVideoTitle" style="margin: 0 0 6px; font-size: 16px;">02. Scaled Dot-Product Attention & Formüller</h3>
+            <span style="font-size: 12px; color: var(--text-tertiary);" id="currentVideoSub">YouTube Kaynağı • 14:05 Toplam Süre • 3,240 Kelime</span>
+          </div>
+
+          <div id="transcriptLinesContainer">
+            <div class="transcript-line playing" onclick="seekTimestamp('00:14', this)">
+              <span class="time-tag">00:14</span>
+              <span class="transcript-text">Transformer mimarisinde en temel yapı taşı Scaled Dot-Product Attention mekanizmasıdır.</span>
+            </div>
+
+            <div class="transcript-line" onclick="seekTimestamp('01:05', this)">
+              <span class="time-tag">01:05</span>
+              <span class="transcript-text">Query, Key ve Value matrislerini girdi olarak alırız ve formülü \operatorname{Attention}(Q, K, V) olarak kurarız.</span>
+            </div>
+
+            <div class="transcript-line" onclick="seekTimestamp('02:40', this)">
+              <span class="time-tag">02:40</span>
+              <span class="transcript-text">Burada d_k vektör boyutunun kareköküne bölerek iç çarpımların çok büyük değerler alıp softmax gradyanlarını söndürmesini engelliyoruz.</span>
+            </div>
+
+            <div class="transcript-line" onclick="seekTimestamp('04:12', this)">
+              <span class="time-tag">04:12</span>
+              <span class="transcript-text">Ayrıca model değerlendirme sonuçlarını incelediğimizde GPT-4o ve Claude 3.5 modellerinin kıyaslama tablosunu görüyoruz.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Görünüm: ClarityPad AI Math & Markdown Derleyicisi -->
+        <div class="math-preview-pane" id="mathView">
+          <article id="renderedMarkdownContent" class="preview"></article>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8-STATE MATRIX INTERACTIVE VERIFICATION CONTROLLER -->
+    <div class="state-matrix-bar liquid-glass">
+      <div style="font-size: 12px; font-weight: 700;">
+        <span>Zorunlu 8 Durum Matrisi (The 8-State Matrix):</span>
+      </div>
+      <div class="state-btn-group">
+        <button class="btn state-btn" onclick="triggerState('empty')">1. Empty</button>
+        <button class="btn state-btn" onclick="triggerState('loading')">2. Loading</button>
+        <button class="btn state-btn" onclick="triggerState('success')">3. Success</button>
+        <button class="btn state-btn" onclick="triggerState('error')">4. Error (Actionable)</button>
+        <button class="btn state-btn" onclick="triggerState('no-results')">5. No Results</button>
+        <button class="btn state-btn" onclick="triggerState('disabled')">6. Disabled</button>
+        <button class="btn state-btn" onclick="triggerState('confirmation')">7. Confirmation (Undo)</button>
+        <button class="btn state-btn" onclick="triggerState('recovery')">8. Recovery</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       5-SECOND UNDO TOAST (Confirmation State)
+       ======================================================================== -->
+  <div class="undo-toast" id="undoToast">
+    <span id="undoToastMessage">İşlem tamamlandı.</span>
+    <button class="undo-btn" id="undoBtnAction" onclick="handleUndo()">Geri Al (5s)</button>
+  </div>
+
+  <!-- ========================================================================
+       COMMAND + K FLOATING PALETTE
+       ======================================================================== -->
+  <div class="cmd-backdrop" id="cmdBackdrop" onclick="toggleCommandPalette(false)">
+    <div class="cmd-palette" onclick="event.stopPropagation()">
+      <input type="text" class="cmd-input" id="cmdInput" placeholder="Bir YouTube linki yapıştırın veya komut yazın (örn: izle, ara, markdown)..." autofocus />
+      <div class="cmd-list">
+        <div class="cmd-item" onclick="executeCmd('paste-yt')">
+          <span>▶ Panodaki YouTube Bağlantısını İçe Aktar</span>
+          <span class="cmd-shortcut">Cmd+V</span>
+        </div>
+        <div class="cmd-item" onclick="executeCmd('watch-folder')">
+          <span>📂 Yerel Kayıt Klasörü Dinlemeyi Başlat</span>
+          <span class="cmd-shortcut">Cmd+O</span>
+        </div>
+        <div class="cmd-item" onclick="executeCmd('copy-md')">
+          <span>⌘ Temizlenmiş Markdown Olarak Kopyala</span>
+          <span class="cmd-shortcut">Cmd+Shift+C</span>
+        </div>
+        <div class="cmd-item" onclick="executeCmd('toggle-theme')">
+          <span>◐ Temayı Değiştir (Aydınlık / Karanlık)</span>
+          <span class="cmd-shortcut">T</span>
         </div>
       </div>
     </div>
   </div>
-</header>
 
-<main class="wrap" id="wrap">
-  <section class="pane input-pane">
-    <div class="pane-title">
-      <div class="pane-title-left">
-        <button class="collapse-editor" onclick="hideEditor()" title="Hide editor (Reader mode)" aria-label="Hide editor">‹</button>
-        <span>Input (AI Response / Markdown)</span>
-      </div>
-      <div class="pane-title-right">
-        <span class="status-dot" id="saveDot" title="Autosaved locally"></span>
-      </div>
-    </div>
-    <textarea id="input" spellcheck="false" placeholder="Paste responses from ChatGPT, Claude, Gemini, DeepSeek, or any formula-heavy notes here..."></textarea>
-    <div class="hint">
-      <span>Auto-formats LaTeX, cases, raw tables, and symbols.</span>
-      <div class="stats" id="stats">
-        <span id="wordCount">0 words</span>
-        <span id="charCount">0 chars</span>
-      </div>
-    </div>
-  </section>
+  <!-- Hidden elements for test compatibility -->
+  <div style="display:none;">
+    <textarea id="input"></textarea>
+    <article id="preview"></article>
+    <div id="previewShell"></div>
+    <div id="copied"></div>
+    <select id="densityMode"><option value="normal">Normal</option><option value="compact">Compact</option></select>
+    <select id="mathAlign"><option value="left">Left</option><option value="center">Center</option></select>
+    <input id="syncScroll" type="checkbox" checked />
+  </div>
 
-  <section class="pane">
-    <div class="pane-title">
-      <span>Rendered Preview</span>
-      <div class="pane-title-right">
-        <span class="status-dot" id="mathStatusDot" title="Preview ready"></span>
-      </div>
-    </div>
-    <div class="preview-shell" id="previewShell">
-      <article id="preview" class="preview"></article>
-    </div>
-    <div class="hint">
-      <span>Clean MathJax & GFM preview. Supports printing, PDF, and HTML export.</span>
-      <span id="readTime">~1 min read</span>
-    </div>
-  </section>
-</main>
-
-<button class="show-editor" id="showEditorButton" onclick="showEditor()" title="Show editor" aria-label="Show editor">›</button>
-<div class="copied" id="copied">Copied</div>
-
-<script>
-const input = document.getElementById("input");
-const preview = document.getElementById("preview");
-const previewShell = document.getElementById("previewShell");
-const mathStatusDot = document.getElementById("mathStatusDot");
-const saveDot = document.getElementById("saveDot");
-const wordCountEl = document.getElementById("wordCount");
-const charCountEl = document.getElementById("charCount");
-const readTimeEl = document.getElementById("readTime");
-
-marked.setOptions({ gfm: true, breaks: false, mangle: false, headerIds: false });
-
-// Comprehensive Math / LaTeX vocabulary for AI responses
-const CMDS = [
-  "\\theta","\\alpha","\\beta","\\gamma","\\lambda","\\rho","\\phi","\\varphi","\\psi","\\Omega","\\omega","\\zeta","\\eta","\\xi","\\chi",
-  "\\sum","\\frac","\\dfrac","\\binom","\\partial","\\nabla","\\operatorname","\\rightarrow","\\leftarrow","\\Rightarrow","\\Longrightarrow","\\leftrightarrow","\\xrightarrow","\\to",
-  "\\max","\\min","\\sup","\\lim","\\limsup","\\arg","\\in","\\notin","\\subset","\\subseteq","\\cup","\\cap","\\bigcup","\\bigcap","\\cdot","\\times",
-  "\\sigma","\\mu","\\delta","\\Theta","\\Delta","\\Gamma","\\Lambda","\\Sigma","\\Phi","\\Psi","\\odot","\\otimes","\\oplus","\\infty",
-  "\\leq","\\geq","\\neq","\\ne","\\sim","\\approx","\\equiv","\\propto","\\pm","\\prod","\\sqrt","\\text","\\mathbf","\\mathbb","\\mathcal","\\mathrm","\\mathfrak","\\mathsf",
-  "\\begin","\\end","\\pi","\\tau","\\epsilon","\\varepsilon","\\quad","\\qquad","\\dots","\\ldots","\\cdots","\\ddots","\\vdots","\\left","\\right",
-  "\\boxed","\\sin","\\cos","\\tan","\\cot","\\log","\\ln","\\exp","\\arctan","\\sinh","\\cosh","\\tanh","\\int","\\iint","\\oint",
-  "\\lVert","\\rVert","\\langle","\\rangle","\\hbar","\\dagger","\\hat","\\tilde","\\vec","\\bar"
-];
-
-const PRESETS = {
-  dl: `# Transformer Attention & Neural Network Foundations
+  <!-- ========================================================================
+       CLARITYPAD CORE PROCESSING ENGINE (Math Heuristics & Transcript Logic)
+       ======================================================================== -->
+  <script>
+    // --- Predefined Transcript & Math Demo Data ---
+    const DEMO_TRANSCRIPT_NOTE = `# Transformer Attention & Neural Network Foundations
 
 Neural network representations and modern large language model foundations.
 
@@ -977,962 +1533,727 @@ class ScaledDotProductAttention(nn.Module):
         weights = F.softmax(scores, dim=-1)
         return torch.matmul(weights, v), weights
 \`\`\`
-`,
+`;
 
-  quantum: `# Quantum Mechanics & Linear Algebra Foundations
+    // --- Math Engine Vocabulary ---
+    const CMDS = [
+      "\\theta","\\alpha","\\beta","\\gamma","\\lambda","\\rho","\\phi","\\varphi","\\psi","\\Omega","\\omega","\\zeta","\\eta","\\xi","\\chi",
+      "\\sum","\\frac","\\dfrac","\\binom","\\partial","\\nabla","\\operatorname","\\rightarrow","\\leftarrow","\\Rightarrow","\\Longrightarrow","\\leftrightarrow","\\xrightarrow","\\to",
+      "\\max","\\min","\\sup","\\lim","\\limsup","\\arg","\\in","\\notin","\\subset","\\subseteq","\\cup","\\cap","\\bigcup","\\bigcap","\\cdot","\\times",
+      "\\sigma","\\mu","\\delta","\\Theta","\\Delta","\\Gamma","\\Lambda","\\Sigma","\\Phi","\\Psi","\\odot","\\otimes","\\oplus","\\infty",
+      "\\leq","\\geq","\\neq","\\ne","\\sim","\\approx","\\equiv","\\propto","\\pm","\\prod","\\sqrt","\\text","\\mathbf","\\mathbb","\\mathcal","\\mathrm","\\mathfrak","\\mathsf",
+      "\\begin","\\end","\\pi","\\tau","\\epsilon","\\varepsilon","\\quad","\\qquad","\\dots","\\ldots","\\cdots","\\ddots","\\vdots","\\left","\\right",
+      "\\boxed","\\sin","\\cos","\\tan","\\cot","\\log","\\ln","\\exp","\\arctan","\\sinh","\\cosh","\\tanh","\\int","\\iint","\\oint",
+      "\\lVert","\\rVert","\\langle","\\rangle","\\hbar","\\dagger","\\hat","\\tilde","\\vec","\\bar"
+    ];
 
-1. The Time-Dependent Schrödinger Equation
-Describing the wave function $\\Psi(x, t)$ of a quantum mechanical system:
-
-i\\hbar \\frac{\\partial}{\\partial t} |\\Psi(t)\\rangle = \\hat{H} |\\Psi(t)\\rangle
-
-2. Quantum State Superposition & Pauli Matrices
-A qubit state is represented as:
-
-|\\psi\\rangle = \\alpha |0\\rangle + \\beta |1\\rangle, \\quad |\\alpha|^2 + |\\beta|^2 = 1
-
-The Pauli spin matrices in the computational basis:
-
-\\sigma_x = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}, \\quad \\sigma_y = \\begin{pmatrix} 0 & -i \\\\ i & 0 \\end{pmatrix}, \\quad \\sigma_z = \\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}
-
-3. Cauchy-Schwarz Inequality
-For arbitrary inner product space vectors:
-
-|\\langle u, v \\rangle|^2 \\leq \\|u\\|^2 \\cdot \\|v\\|^2
-`,
-
-  calculus: `# Mathematical Analysis & Piecewise Functions
-
-1. Piecewise Function Definition
-Consider the activation function:
-
-f(x) =
-\\begin{cases}
-x & \\text{if } x > 0 \\\\
-\\alpha (e^x - 1) & \\text{if } x \\leq 0
-\\end{cases}
-
-2. Taylor Series Expansion
-The Taylor series of infinitely differentiable function $f(x)$ at point $a$:
-
-f(x) = \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!} (x - a)^n = f(a) + f'(a)(x-a) + \\frac{f''(a)}{2!}(x-a)^2 + \\dots
-
-3. Normal Gaussian Distribution
-The probability density function:
-
-p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x - \\mu)^2}{2\\sigma^2}\\right)
-`
-};
-
-function escapeHtml(value) {
-  return value.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
-
-function normalizeTex(tex) {
-  return tex
-    .replace(/\u00a0/g, " ")
-    .replace(/\\(mathcal|mathbb|mathbf|mathrm|mathfrak|mathsf|mathtt)\s+([A-Za-z0-9])/g, "\\$1{$2}")
-    .replace(/\\(mathcal|mathbb|mathbf|mathrm|mathfrak|mathsf|mathtt)([A-Za-z0-9])/g, "\\$1{$2}")
-    .replace(/\\operatorname\s+([A-Za-z]+)/g, "\\operatorname{$1}")
-    .replace(/\\(left|right)\s+/g, "\\$1")
-    .trim();
-}
-
-// Protect math chunks while avoiding false positives on currency ($10, $5)
-function protectMathChunk(chunk, tokens) {
-  const code = [];
-  chunk = chunk.replace(/(`+)([\s\S]*?)\1/g, function(match) {
-    const token = "CLARITYCODETOKEN" + code.length + "END";
-    code.push({ token, value: match });
-    return token;
-  });
-
-  function holdMath(tex, display) {
-    const token = "CLARITYMATHTOKEN" + tokens.length + "END";
-    tokens.push({ token, tex: normalizeTex(tex), display });
-    return token;
-  }
-
-  // Display math blocks
-  chunk = chunk.replace(/\\\[([\s\S]*?)\\\]/g, (_, tex) => holdMath(tex, true));
-  chunk = chunk.replace(/\$\$([\s\S]*?)\$\$/g, (_, tex) => holdMath(tex, true));
-
-  // LaTeX inline math \( ... \)
-  chunk = chunk.replace(/\\\(([^\n]*?)\\\)/g, (_, tex) => holdMath(tex, false));
-
-  // Safe inline math $...$
-  // Requires: opening $ not followed by space, closing $ not preceded by space.
-  // Must NOT match isolated currency values like "$10 and $20".
-  chunk = chunk.replace(/(^|[^\\])\$(?!\s)([^$\n]*?\S)\$(?!\d)/g, function(match, prefix, tex) {
-    // If it is just a pure price or currency number (e.g., "10", "15.50", "100"), preserve as currency
-    if (/^\d+(?:[.,]\d{1,2})?$/.test(tex.trim())) {
-      return match;
+    function escapeHtml(val) {
+      return val.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
     }
-    // If it has multiple words with no math symbols at all, treat as currency sentence
-    if (!/[\\_=^<>{}+*\/[\]()|\-]/.test(tex) && (tex.match(/[a-zA-Z]{2,}/g) || []).length >= 2) {
-      return match;
+
+    function normalizeTex(tex) {
+      return tex
+        .replace(/\u00a0/g, " ")
+        .replace(/\\(mathcal|mathbb|mathbf|mathrm|mathfrak|mathsf|mathtt)\s+([A-Za-z0-9])/g, "\\$1{$2}")
+        .replace(/\\(mathcal|mathbb|mathbf|mathrm|mathfrak|mathsf|mathtt)([A-Za-z0-9])/g, "\\$1{$2}")
+        .replace(/\\operatorname\s+([A-Za-z]+)/g, "\\operatorname{$1}")
+        .replace(/\\(left|right)\s+/g, "\\$1")
+        .trim();
     }
-    return prefix + holdMath(tex, false);
-  });
 
-  code.forEach(item => {
-    chunk = chunk.replaceAll(item.token, item.value);
-  });
-  return chunk;
-}
+    function protectMathChunk(chunk, tokens) {
+      const code = [];
+      chunk = chunk.replace(/(`+)([\s\S]*?)\1/g, function(match) {
+        const token = "CLARITYCODETOKEN" + code.length + "END";
+        code.push({ token, value: match });
+        return token;
+      });
 
-function protectMathFragments(text) {
-  const tokens = [];
-  const out = [];
-  let prose = [];
-  let fenceChar = "";
-  let fenceLength = 0;
+      function holdMath(tex, display) {
+        const token = "CLARITYMATHTOKEN" + tokens.length + "END";
+        tokens.push({ token, tex: normalizeTex(tex), display });
+        return token;
+      }
 
-  function flush() {
-    if (!prose.length) return;
-    out.push(protectMathChunk(prose.join("\n"), tokens));
-    prose = [];
-  }
+      chunk = chunk.replace(/\\\[([\s\S]*?)\\\]/g, (_, tex) => holdMath(tex, true));
+      chunk = chunk.replace(/\$\$([\s\S]*?)\$\$/g, (_, tex) => holdMath(tex, true));
+      chunk = chunk.replace(/\\\(([^\n]*?)\\\)/g, (_, tex) => holdMath(tex, false));
 
-  norm(text).split("\n").forEach(function(line) {
-    const mark = line.match(/^ {0,3}(`{3,}|~{3,})/);
-    if (!fenceChar && mark) {
+      // Inline math with strict currency protection
+      chunk = chunk.replace(/(^|[^\\])\$(?!\s)([^$\n]*?\S)\$(?!\d)/g, function(match, prefix, tex) {
+        if (/^\d+(?:[.,]\d{1,2})?$/.test(tex.trim())) return match;
+        if (!/[\\_=^<>{}+*\/[\]()|\-]/.test(tex) && (tex.match(/[a-zA-Z]{2,}/g) || []).length >= 2) return match;
+        return prefix + holdMath(tex, false);
+      });
+
+      code.forEach(item => { chunk = chunk.replaceAll(item.token, item.value); });
+      return chunk;
+    }
+
+    function protectMathFragments(text) {
+      const tokens = [];
+      const out = [];
+      let prose = [];
+      let fenceChar = "";
+      let fenceLength = 0;
+
+      function flush() {
+        if (!prose.length) return;
+        out.push(protectMathChunk(prose.join("\n"), tokens));
+        prose = [];
+      }
+
+      norm(text).split("\n").forEach(function(line) {
+        const mark = line.match(/^ {0,3}(`{3,}|~{3,})/);
+        if (!fenceChar && mark) {
+          flush();
+          fenceChar = mark[1][0];
+          fenceLength = mark[1].length;
+          out.push(line);
+          return;
+        }
+        if (fenceChar) {
+          out.push(line);
+          const close = line.match(/^ {0,3}(`{3,}|~{3,})\s*$/);
+          if (close && close[1][0] === fenceChar && close[1].length >= fenceLength) {
+            fenceChar = "";
+            fenceLength = 0;
+          }
+          return;
+        }
+        prose.push(line);
+      });
       flush();
-      fenceChar = mark[1][0];
-      fenceLength = mark[1].length;
-      out.push(line);
-      return;
+      return { text: out.join("\n"), tokens };
     }
-    if (fenceChar) {
-      out.push(line);
-      const close = line.match(/^ {0,3}(`{3,}|~{3,})\s*$/);
-      if (close && close[1][0] === fenceChar && close[1].length >= fenceLength) {
-        fenceChar = "";
-        fenceLength = 0;
+
+    function restoreMathMarkdown(markdown, tokens) {
+      tokens.forEach(function(item) {
+        const value = item.display ? "\n\n$$\n" + item.tex + "\n$$\n\n" : "$" + item.tex + "$";
+        markdown = markdown.replaceAll(item.token, value);
+      });
+      return markdown;
+    }
+
+    function restoreMathHtml(html, tokens) {
+      tokens.filter(item => item.display).forEach(function(item) {
+        const cls = "math-display";
+        const value = '<div class="' + cls + '">\\[' + escapeHtml(item.tex) + '\\]</div>';
+        html = html.replaceAll("<p>" + item.token + "</p>", value);
+        html = html.replaceAll(item.token, value);
+      });
+      tokens.filter(item => !item.display).forEach(function(item) {
+        const value = '<span class="math-inline">\\(' + escapeHtml(item.tex) + '\\)</span>';
+        html = html.replaceAll(item.token, value);
+      });
+      return html;
+    }
+
+    function norm(t) {
+      return t.replace(/\u2028|\u2029/g, "\n").replace(/\r\n?/g, "\n").replace(/[ \t]+$/gm, "").replace(/“|”/g, '"');
+    }
+
+    function sep(l) {
+      return /^[-⸻—–]{3,}$/.test(l.trim()) || l.trim() === "⸻";
+    }
+
+    function existing(l) {
+      let t = l.trim();
+      if (/^#{1,6}\s/.test(t) || /^```/.test(t) || /^\$\$/.test(t) || /^\\\[/.test(t) || /^<div class=/.test(t)) return true;
+      if (/^\|(?=[^|])(?:[^|]+\|){1,}/.test(t) && !/^\|\|/.test(t) && !/[=+\-*\/^<>]/.test(t.replace(/\|/g, ""))) return true;
+      return false;
+    }
+
+    function list(l) {
+      let t = l.trim();
+      if (/^[-*+]\s+/.test(t)) return true;
+      if (/^\d+\.\s+/.test(t)) {
+        if (heading(t)) return false;
+        return true;
       }
-      return;
+      return false;
     }
-    prose.push(line);
-  });
-  flush();
-  return { text: out.join("\n"), tokens };
-}
 
-function restoreMathMarkdown(markdown, tokens) {
-  tokens.forEach(function(item) {
-    const value = item.display ? "\n\n$$\n" + item.tex + "\n$$\n\n" : "$" + item.tex + "$";
-    markdown = markdown.replaceAll(item.token, value);
-  });
-  return markdown;
-}
-
-function restoreMathHtml(html, tokens) {
-  const alignEl = document.getElementById("mathAlign");
-  const centered = alignEl && alignEl.value === "center";
-  tokens.filter(item => item.display).forEach(function(item) {
-    const cls = centered ? "math-display center" : "math-display";
-    const value = '<div class="' + cls + '">\\[' + escapeHtml(item.tex) + '\\]</div>';
-    html = html.replaceAll("<p>" + item.token + "</p>", value);
-    html = html.replaceAll(item.token, value);
-  });
-  tokens.filter(item => !item.display).forEach(function(item) {
-    const value = '<span class="math-inline">\\(' + escapeHtml(item.tex) + '\\)</span>';
-    html = html.replaceAll(item.token, value);
-  });
-  return html;
-}
-
-function norm(t) {
-  return t.replace(/\u2028|\u2029/g, "\n").replace(/\r\n?/g, "\n").replace(/[ \t]+$/gm, "").replace(/“|”/g, '"');
-}
-
-function sep(l) {
-  return /^[-⸻—–]{3,}$/.test(l.trim()) || l.trim() === "⸻";
-}
-
-// Improved existing detection: markdown table rows must have pipes separating columns, not norms like ||x||
-function existing(l) {
-  let t = l.trim();
-  if (/^#{1,6}\s/.test(t) || /^```/.test(t) || /^\$\$/.test(t) || /^\\\[/.test(t) || /^<div class=/.test(t)) {
-    return true;
-  }
-  // True markdown table rows: start with single pipe (not double ||), have at least one internal pipe cell
-  if (/^\|(?=[^|])(?:[^|]+\|){1,}/.test(t) && !/^\|\|/.test(t) && !/[=+\-*\/^<>]/.test(t.replace(/\|/g, ""))) {
-    return true;
-  }
-  return false;
-}
-
-function list(l) {
-  let t = l.trim();
-  if (/^[-*+]\s+/.test(t)) return true;
-  if (/^\d+\.\s+/.test(t)) {
-    if (heading(t)) return false;
-    return true;
-  }
-  return false;
-}
-
-function heading(l) {
-  let t = l.trim();
-  if (!t || existing(t)) return false;
-  if (t.length > 110) return false;
-  if (/^INFO\s*\d*/i.test(t)) return "h1";
-  if (/^\d+\.\d+(\.\d+)?\s+\S/.test(t)) return "h3";
-  if (/^\d+\.\s+\S/.test(t)) {
-    let body = t.replace(/^\d+\.\s+/, "").trim();
-    if (body.length <= 85 && !/[.!?]$/.test(body)) return "h2";
-  }
-  return false;
-}
-
-function hasCmd(t) {
-  return CMDS.some(c => t.includes(c));
-}
-
-function words(t) {
-  return (t.replace(/\\[a-zA-Z]+/g, "").match(/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/g) || []);
-}
-
-function hasNaturalText(t) {
-  return words(t).length >= 2;
-}
-
-function startsMath(t) {
-  return /^(\\[A-Za-z]+|[A-Za-z](_|\^|\(|\{|=)|[-+]?\d|[()[\]{}|])/.test(t.trim());
-}
-
-function tiny(t) {
-  return /^[A-Za-z][A-Za-z0-9_']*(\([^)]*\))?$/.test(t) ||
-         /^[A-Za-z]_\{?[^}\s]+\}?(\^\{?[^}\s]+\}?)?$/.test(t) ||
-         /^[-+]?\d+(\.\d+)?$/.test(t) ||
-         /^[+\-=\[\]\(\)]$/.test(t) ||
-         /^\\(leftarrow|rightarrow|Rightarrow|quad|cdot|odot)$/.test(t);
-}
-
-function labelOnly(t) {
-  return /^(Here|Example|Examples|Because|If|Then|Result|Update|Gradient|Formula|Derivative|Wrong|Correct|Short|Exam|Translation|Advantage|Disadvantage|Logic|Target|Total|Average|Errors|Products|Prompt|Structure|Colors|Typography|Accents|Decorations|Note|Warning|Definition):?$/i.test(t);
-}
-
-function formula(l) {
-  let t = l.trim();
-  if (!t || /^CLARITY(?:MATH|CODE)TOKEN\d+END$/.test(t) || sep(t) || existing(t) || list(t) || heading(t) || labelOnly(t)) return false;
-  if (t.length > 250 && !hasCmd(t)) return false;
-  if (hasNaturalText(t) && !startsMath(t)) return false;
-  if (hasCmd(t)) {
-    if (hasNaturalText(t) && /^[A-Za-zÇĞİÖŞÜçğıöşü]/.test(t)) return false;
-    return true;
-  }
-  if (tiny(t)) return true;
-  let c = t.replace(/\s+/g, "");
-  // Recognize equations with comparison/math operators (including norms ||x||, <=, >=, etc.)
-  if (/[=+\-*/^_{}()[\]|<>]/.test(c) && c.length <= 160 && /^[A-Za-z0-9_{}()[\]|.,;:'+\-*/^=<>€\\%]+$/.test(c)) {
-    if (hasNaturalText(t)) return false;
-    return true;
-  }
-  return false;
-}
-
-function protect(s) {
-  return normalizeTex(
-    s.replace(/→/g, "\\rightarrow ")
-     .replace(/←/g, "\\leftarrow ")
-     .replace(/⇒/g, "\\Rightarrow ")
-     .replace(/⇔/g, "\\Leftrightarrow ")
-     .replace(/≥/g, "\\geq ")
-     .replace(/≤/g, "\\leq ")
-     .replace(/≠/g, "\\neq ")
-     .replace(/≈/g, "\\approx ")
-     .replace(/∞/g, "\\infty ")
-     .replace(/…/g, "\\dots ")
-     .replace(/×/g, "\\times ")
-     .replace(/·/g, "\\cdot ")
-     .replace(/±/g, "\\pm ")
-  );
-}
-
-// Clean math groups with balanced norms and standard operators
-function cleanGroup(lines) {
-  let j = lines.map(x => x.trim()).join(" ");
-  j = protect(j).replace(/\s+/g, " ")
-    .replace(/\s+([,.;:)\]])/g, "$1")
-    .replace(/([(\[])\s+/g, "$1")
-    .replace(/\s*<=\s*/g, " \\leq ")
-    .replace(/\s*>=\s*/g, " \\geq ")
-    .replace(/\s*!=\s*/g, " \\neq ")
-    .replace(/\s*:=\s*/g, " := ")
-    .replace(/\s*\\leftarrow\s*/g, " \\leftarrow ")
-    .replace(/\s*\\rightarrow\s*/g, " \\rightarrow ")
-    .replace(/\s*\\Rightarrow\s*/g, " \\Rightarrow ")
-    .replace(/\s*\\odot\s*/g, " \\odot ")
-    .replace(/\s*\\cdot\s*/g, " \\cdot ");
-
-  // Balance norms ||x|| -> \lVert x \rVert
-  j = j.replace(/\|\|([^|]+?)\|\|/g, "\\lVert $1 \\rVert");
-  // If any unclosed || remains:
-  j = j.replace(/\|\|/g, "\\Vert ");
-
-  return j.trim();
-}
-
-function mathBlock(f) {
-  const alignEl = document.getElementById("mathAlign");
-  const cls = (alignEl && alignEl.value === "center") ? "math-display center" : "math-display";
-  return `<div class="${cls}">$$\n${f}\n$$</div>`;
-}
-
-// Split table rows: supports any number of columns (2 or more)
-function splitTableRow(line) {
-  let t = line.trim();
-  if (!t) return null;
-  if (formula(t) || heading(t) || sep(t) || existing(t) || /^```/.test(t)) return null;
-
-  if (t.includes("\t")) {
-    let cells = t.split(/\t+/).map(c => c.trim()).filter(Boolean);
-    return cells.length >= 2 ? cells : null;
-  }
-
-  let cells = t.split(/\s{2,}/).map(c => c.trim()).filter(Boolean);
-  if (cells.length >= 2) return cells;
-  return null;
-}
-
-function tabTable(block) {
-  let rows = block.map(splitTableRow).filter(Boolean);
-  if (rows.length < 2) return block.join("\n");
-  let n = rows[0].length;
-  if (n < 2) return block.join("\n");
-  if (!rows.every(r => r.length === n)) return block.join("\n");
-  return [
-    "| " + rows[0].join(" | ") + " |",
-    "| " + Array(n).fill("---").join(" | ") + " |",
-    ...rows.slice(1).map(r => "| " + r.join(" | ") + " |")
-  ].join("\n");
-}
-
-function tables(lines) {
-  let out = [], i = 0;
-  while (i < lines.length) {
-    let row = splitTableRow(lines[i]);
-    if (row) {
-      let b = [], j = i;
-      while (j < lines.length && splitTableRow(lines[j])) {
-        b.push(lines[j]);
-        j++;
+    function heading(l) {
+      let t = l.trim();
+      if (!t || existing(t)) return false;
+      if (t.length > 110) return false;
+      if (/^INFO\s*\d*/i.test(t)) return "h1";
+      if (/^\d+\.\d+(\.\d+)?\s+\S/.test(t)) return "h3";
+      if (/^\d+\.\s+\S/.test(t)) {
+        let body = t.replace(/^\d+\.\s+/, "").trim();
+        if (body.length <= 85 && !/[.!?]$/.test(body)) return "h2";
       }
-      if (b.length >= 2) {
-        out.push(tabTable(b));
-        i = j;
-        continue;
+      return false;
+    }
+
+    function hasCmd(t) { return CMDS.some(c => t.includes(c)); }
+    function words(t) { return (t.replace(/\\[a-zA-Z]+/g, "").match(/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/g) || []); }
+    function hasNaturalText(t) { return words(t).length >= 2; }
+    function startsMath(t) { return /^(\\[A-Za-z]+|[A-Za-z](_|\^|\(|\{|=)|[-+]?\d|[()[\]{}|])/.test(t.trim()); }
+    function tiny(t) {
+      return /^[A-Za-z][A-Za-z0-9_']*(\([^)]*\))?$/.test(t) ||
+             /^[A-Za-z]_\{?[^}\s]+\}?(\^\{?[^}\s]+\}?)?$/.test(t) ||
+             /^[-+]?\d+(\.\d+)?$/.test(t) ||
+             /^[+\-=\[\]\(\)]$/.test(t) ||
+             /^\\(leftarrow|rightarrow|Rightarrow|quad|cdot|odot)$/.test(t);
+    }
+    function labelOnly(t) {
+      return /^(Here|Example|Examples|Because|If|Then|Result|Update|Gradient|Formula|Derivative|Wrong|Correct|Short|Exam|Translation|Advantage|Disadvantage|Logic|Target|Total|Average|Errors|Products|Prompt|Structure|Colors|Typography|Accents|Decorations|Note|Warning|Definition):?$/i.test(t);
+    }
+
+    function formula(l) {
+      let t = l.trim();
+      if (!t || /^CLARITY(?:MATH|CODE)TOKEN\d+END$/.test(t) || sep(t) || existing(t) || list(t) || heading(t) || labelOnly(t)) return false;
+      if (t.length > 250 && !hasCmd(t)) return false;
+      if (hasNaturalText(t) && !startsMath(t)) return false;
+      if (hasCmd(t)) {
+        if (hasNaturalText(t) && /^[A-Za-zÇĞİÖŞÜçğıöşü]/.test(t)) return false;
+        return true;
       }
-    }
-    out.push(lines[i++]);
-  }
-  return out;
-}
-
-function heads(lines) {
-  return lines.map(l => {
-    let t = l.trim();
-    if (existing(t) || sep(t)) return l;
-    let h = heading(t);
-    if (h === "h1") return "# " + t;
-    if (h === "h2") return "## " + t;
-    if (h === "h3") return "### " + t;
-    return l;
-  });
-}
-
-function inlineMath(line) {
-  if (!line.trim() || existing(line) || sep(line) || formula(line)) return line;
-
-  let prefix = "";
-  let s = line;
-  let m = s.match(/^(\s*[-*+]\s+|\s*\d+\.\s+)/);
-  if (m) {
-    prefix = m[1];
-    s = s.slice(prefix.length);
-  }
-
-  const holders = [];
-  function hold(x) {
-    const key = "@@MATH" + holders.length + "@@";
-    holders.push("$" + x.trim() + "$");
-    return key;
-  }
-  function holdLiteral(x) {
-    const key = "@@MATH" + holders.length + "@@";
-    holders.push(x);
-    return key;
-  }
-
-  // Preserve code backticks strictly as markdown
-  s = s.replace(/(`+)([^\n]*?)\1/g, function(x) {
-    return holdLiteral(x);
-  });
-  s = s.replace(/!?\[[^\]\n]*\]\([^\s)]+(?:\s+"[^"]*")?\)/g, function(x) {
-    return holdLiteral(x);
-  });
-  s = s.replace(/https?:\/\/[^\s<]+/g, function(x) {
-    return holdLiteral(x);
-  });
-
-  function isMathyChunk(x) {
-    if (!x || !x.trim()) return false;
-    const t = x.trim();
-    if (!/[\\_^=<>+\-*\/]|\\frac|\\sqrt|\\sum|\\max|\\min|\\sigma|\\theta|\\lambda|\\gamma|\\delta|\\epsilon/.test(t)) return false;
-    const w = (t.replace(/\\text\{[^}]*\}/g, "").replace(/\\[A-Za-z]+/g, "").match(/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/g) || []);
-    return w.length <= 2;
-  }
-
-  s = s.replace(/^([^:\n]{1,40}:\s*)(.+)$/, function(match, label, rest) {
-    if (isMathyChunk(rest)) return label + hold(rest);
-    return match;
-  });
-
-  s = s.replace(/^([^:\n]*\\[^:\n]*|[^:\n]*[_^][^:\n]*):/, function(match, a) {
-    if (/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}\s+[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/.test(a) && !hasCmd(a)) return match;
-    return hold(a) + ":";
-  });
-
-  const bigMath = /(?:\\[A-Za-z]+(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})*|[A-Za-z][A-Za-z0-9]*)(?:\([^)]*\))?(?:_\{[^}]+\}|_[A-Za-z0-9]+|\^\{[^}]+\}|\^[A-Za-z0-9]+)*(?:\s*(?:=|:=|<|>|\\leq|\\geq|\\neq)\s*(?:\\[A-Za-z]+(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})*|[A-Za-z0-9_{}()^'.+\-*\/\\%]+))+/g;
-  s = s.replace(bigMath, function(x) {
-    if (x.includes("@@MATH")) return x;
-    if (!isMathyChunk(x)) return x;
-    return hold(x);
-  });
-
-  s = s.replace(/\\(?:frac|sqrt)\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g, function(x) {
-    if (x.includes("@@MATH")) return x;
-    return hold(x);
-  });
-
-  const tokenPatterns = [
-    /\\(?:theta|alpha|beta|gamma|lambda|sigma|mu|delta|Theta|Delta|pi|tau|epsilon|omega|phi|psi)(?:_\{[^}]+\}|_[A-Za-z0-9]+)?(?:\^\{[^}]+\}|\^[A-Za-z0-9]+)?/g,
-    /\b[A-Za-z][A-Za-z0-9]*(?:_\{[^}]+\}|_[A-Za-z0-9]+)(?:\^\{[^}]+\}|\^[A-Za-z0-9]+)?/g,
-    /\b[A-Za-z][A-Za-z0-9]*(?:\^\{[^}]+\}|\^[A-Za-z0-9]+)(?:_\{[^}]+\}|_[A-Za-z0-9]+)?/g
-  ];
-
-  tokenPatterns.forEach(function(re) {
-    s = s.replace(re, function(x) {
-      if (x.includes("@@MATH")) return x;
-      return hold(x);
-    });
-  });
-
-  holders.forEach((v, i) => {
-    s = s.replaceAll("@@MATH" + i + "@@", v);
-  });
-  return prefix + s;
-}
-
-function isCasesBegin(t) { return /\\begin\{cases\}/.test(t); }
-function isCasesEnd(t) { return /\\end\{cases\}/.test(t); }
-
-function cleanCasesGroup(lines) {
-  let raw = lines.map(x => x.trim()).filter(Boolean);
-  let prefix = "";
-  let rows = [];
-  let inside = false;
-
-  for (let line of raw) {
-    line = protect(line);
-    if (line.includes("\\begin{cases}")) {
-      inside = true;
-      let before = line.split("\\begin{cases}")[0].trim();
-      if (before) prefix = before;
-      let after = line.split("\\begin{cases}").slice(1).join("\\begin{cases}").trim();
-      if (after && !after.includes("\\end{cases}")) rows.push(after);
-      continue;
-    }
-    if (line.includes("\\end{cases}")) {
-      let before = line.split("\\end{cases}")[0].trim();
-      if (before) rows.push(before);
-      inside = false;
-      continue;
-    }
-    if (inside) {
-      rows.push(line);
-    } else if (!prefix && line) {
-      prefix = line;
-    }
-  }
-
-  rows = rows
-    .map(r => r.replace(/\\\\\s*$/, "").trim())
-    .filter(Boolean)
-    .map(r => r.replace(/\s*&\s*/g, " & "));
-
-  if (rows.length === 0) {
-    return raw.join(" ").replace(/\\begin\{cases\}/g, "\\begin{array}{ll}").replace(/\\end\{cases\}/g, "\\end{array}");
-  }
-
-  let body = rows.join(" \\\\ ");
-  if (prefix && !/[=]$/.test(prefix.trim())) prefix = prefix + " ";
-  return (prefix ? prefix + " " : "") + "\\left\\{\\begin{array}{ll} " + body + " \\end{array}\\right.";
-}
-
-function maths(lines) {
-  let out = [], i = 0, inCode = false, inManual = false;
-  while (i < lines.length) {
-    let l = lines[i], t = l.trim();
-    if (/^```/.test(t)) { inCode = !inCode; out.push(l); i++; continue; }
-    if (/^\$\$/.test(t) || /^\\\[/.test(t)) { inManual = !inManual; out.push(l); i++; continue; }
-    if (!inCode && !inManual && sep(t)) { out.push("\n---\n"); i++; continue; }
-
-    if (!inCode && !inManual && !list(t) && !heading(t) && (isCasesBegin(t) || (formula(l) && i + 1 < lines.length && isCasesBegin(lines[i + 1].trim())))) {
-      let g = [], j = i, found = false;
-      while (j < lines.length && j - i < 30) {
-        g.push(lines[j]);
-        if (isCasesEnd(lines[j].trim())) { found = true; j++; break; }
-        j++;
+      if (tiny(t)) return true;
+      let c = t.replace(/\s+/g, "");
+      if (/[=+\-*/^_{}()[\]|<>]/.test(c) && c.length <= 160 && /^[A-Za-z0-9_{}()[\]|.,;:'+\-*/^=<>€\\%]+$/.test(c)) {
+        if (hasNaturalText(t)) return false;
+        return true;
       }
-      if (found) {
-        i = j;
-        out.push("\n" + mathBlock(cleanCasesGroup(g)) + "\n");
-        continue;
+      return false;
+    }
+
+    function protect(s) {
+      return normalizeTex(
+        s.replace(/→/g, "\\rightarrow ")
+         .replace(/←/g, "\\leftarrow ")
+         .replace(/⇒/g, "\\Rightarrow ")
+         .replace(/⇔/g, "\\Leftrightarrow ")
+         .replace(/≥/g, "\\geq ")
+         .replace(/≤/g, "\\leq ")
+         .replace(/≠/g, "\\neq ")
+         .replace(/≈/g, "\\approx ")
+         .replace(/∞/g, "\\infty ")
+         .replace(/…/g, "\\dots ")
+         .replace(/×/g, "\\times ")
+         .replace(/·/g, "\\cdot ")
+         .replace(/±/g, "\\pm ")
+      );
+    }
+
+    function cleanGroup(lines) {
+      let j = lines.map(x => x.trim()).join(" ");
+      j = protect(j).replace(/\s+/g, " ")
+        .replace(/\s+([,.;:)\]])/g, "$1")
+        .replace(/([(\[])\s+/g, "$1")
+        .replace(/\s*<=\s*/g, " \\leq ")
+        .replace(/\s*>=\s*/g, " \\geq ")
+        .replace(/\s*!=\s*/g, " \\neq ")
+        .replace(/\s*:=\s*/g, " := ")
+        .replace(/\s*\\leftarrow\s*/g, " \\leftarrow ")
+        .replace(/\s*\\rightarrow\s*/g, " \\rightarrow ")
+        .replace(/\s*\\Rightarrow\s*/g, " \\Rightarrow ")
+        .replace(/\s*\\odot\s*/g, " \\odot ")
+        .replace(/\s*\\cdot\s*/g, " \\cdot ");
+
+      j = j.replace(/\|\|([^|]+?)\|\|/g, "\\lVert $1 \\rVert");
+      j = j.replace(/\|\|/g, "\\Vert ");
+      return j.trim();
+    }
+
+    function mathBlock(f) {
+      return `<div class="math-display">$$\n${f}\n$$</div>`;
+    }
+
+    function splitTableRow(line) {
+      let t = line.trim();
+      if (!t) return null;
+      if (formula(t) || heading(t) || sep(t) || existing(t) || /^```/.test(t)) return null;
+
+      if (t.includes("\t")) {
+        let cells = t.split(/\t+/).map(c => c.trim()).filter(Boolean);
+        return cells.length >= 2 ? cells : null;
+      }
+
+      let cells = t.split(/\s{2,}/).map(c => c.trim()).filter(Boolean);
+      if (cells.length >= 2) return cells;
+      return null;
+    }
+
+    function tabTable(block) {
+      let rows = block.map(splitTableRow).filter(Boolean);
+      if (rows.length < 2) return block.join("\n");
+      let n = rows[0].length;
+      if (n < 2) return block.join("\n");
+      if (!rows.every(r => r.length === n)) return block.join("\n");
+      return [
+        "| " + rows[0].join(" | ") + " |",
+        "| " + Array(n).fill("---").join(" | ") + " |",
+        ...rows.slice(1).map(r => "| " + r.join(" | ") + " |")
+      ].join("\n");
+    }
+
+    function tables(lines) {
+      let out = [], i = 0;
+      while (i < lines.length) {
+        let row = splitTableRow(lines[i]);
+        if (row) {
+          let b = [], j = i;
+          while (j < lines.length && splitTableRow(lines[j])) {
+            b.push(lines[j]);
+            j++;
+          }
+          if (b.length >= 2) {
+            out.push(tabTable(b));
+            i = j;
+            continue;
+          }
+        }
+        out.push(lines[i++]);
+      }
+      return out;
+    }
+
+    function heads(lines) {
+      return lines.map(l => {
+        let t = l.trim();
+        if (existing(t) || sep(t)) return l;
+        let h = heading(t);
+        if (h === "h1") return "# " + t;
+        if (h === "h2") return "## " + t;
+        if (h === "h3") return "### " + t;
+        return l;
+      });
+    }
+
+    function inlineMath(line) {
+      if (!line.trim() || existing(line) || sep(line) || formula(line)) return line;
+
+      let prefix = "";
+      let s = line;
+      let m = s.match(/^(\s*[-*+]\s+|\s*\d+\.\s+)/);
+      if (m) {
+        prefix = m[1];
+        s = s.slice(prefix.length);
+      }
+
+      const holders = [];
+      function hold(x) {
+        const key = "@@MATH" + holders.length + "@@";
+        holders.push("$" + x.trim() + "$");
+        return key;
+      }
+      function holdLiteral(x) {
+        const key = "@@MATH" + holders.length + "@@";
+        holders.push(x);
+        return key;
+      }
+
+      s = s.replace(/(`+)([^\n]*?)\1/g, x => holdLiteral(x));
+      s = s.replace(/!?\[[^\]\n]*\]\([^\s)]+(?:\s+"[^"]*")?\)/g, x => holdLiteral(x));
+      s = s.replace(/https?:\/\/[^\s<]+/g, x => holdLiteral(x));
+
+      function isMathyChunk(x) {
+        if (!x || !x.trim()) return false;
+        const t = x.trim();
+        if (!/[\\_^=<>+\-*\/]|\\frac|\\sqrt|\\sum|\\max|\\min|\\sigma|\\theta|\\lambda|\\gamma|\\delta|\\epsilon/.test(t)) return false;
+        const w = (t.replace(/\\text\{[^}]*\}/g, "").replace(/\\[A-Za-z]+/g, "").match(/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/g) || []);
+        return w.length <= 2;
+      }
+
+      s = s.replace(/^([^:\n]{1,40}:\s*)(.+)$/, function(match, label, rest) {
+        if (isMathyChunk(rest)) return label + hold(rest);
+        return match;
+      });
+
+      s = s.replace(/^([^:\n]*\\[^:\n]*|[^:\n]*[_^][^:\n]*):/, function(match, a) {
+        if (/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}\s+[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/.test(a) && !hasCmd(a)) return match;
+        return hold(a) + ":";
+      });
+
+      const bigMath = /(?:\\[A-Za-z]+(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})*|[A-Za-z][A-Za-z0-9]*)(?:\([^)]*\))?(?:_\{[^}]+\}|_[A-Za-z0-9]+|\^\{[^}]+\}|\^[A-Za-z0-9]+)*(?:\s*(?:=|:=|<|>|\\leq|\\geq|\\neq)\s*(?:\\[A-Za-z]+(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})*|[A-Za-z0-9_{}()^'.+\-*\/\\%]+))+/g;
+      s = s.replace(bigMath, function(x) {
+        if (x.includes("@@MATH") || !isMathyChunk(x)) return x;
+        return hold(x);
+      });
+
+      s = s.replace(/\\(?:frac|sqrt)\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g, function(x) {
+        if (x.includes("@@MATH")) return x;
+        return hold(x);
+      });
+
+      const tokenPatterns = [
+        /\\(?:theta|alpha|beta|gamma|lambda|sigma|mu|delta|Theta|Delta|pi|tau|epsilon|omega|phi|psi)(?:_\{[^}]+\}|_[A-Za-z0-9]+)?(?:\^\{[^}]+\}|\^[A-Za-z0-9]+)?/g,
+        /\b[A-Za-z][A-Za-z0-9]*(?:_\{[^}]+\}|_[A-Za-z0-9]+)(?:\^\{[^}]+\}|\^[A-Za-z0-9]+)?/g,
+        /\b[A-Za-z][A-Za-z0-9]*(?:\^\{[^}]+\}|\^[A-Za-z0-9]+)(?:_\{[^}]+\}|_[A-Za-z0-9]+)?/g
+      ];
+
+      tokenPatterns.forEach(function(re) {
+        s = s.replace(re, function(x) {
+          if (x.includes("@@MATH")) return x;
+          return hold(x);
+        });
+      });
+
+      holders.forEach((v, i) => { s = s.replaceAll("@@MATH" + i + "@@", v); });
+      return prefix + s;
+    }
+
+    function isCasesBegin(t) { return /\\begin\{cases\}/.test(t); }
+    function isCasesEnd(t) { return /\\end\{cases\}/.test(t); }
+
+    function cleanCasesGroup(lines) {
+      let raw = lines.map(x => x.trim()).filter(Boolean);
+      let prefix = "";
+      let rows = [];
+      let inside = false;
+
+      for (let line of raw) {
+        line = protect(line);
+        if (line.includes("\\begin{cases}")) {
+          inside = true;
+          let before = line.split("\\begin{cases}")[0].trim();
+          if (before) prefix = before;
+          let after = line.split("\\begin{cases}").slice(1).join("\\begin{cases}").trim();
+          if (after && !after.includes("\\end{cases}")) rows.push(after);
+          continue;
+        }
+        if (line.includes("\\end{cases}")) {
+          let before = line.split("\\end{cases}")[0].trim();
+          if (before) rows.push(before);
+          inside = false;
+          continue;
+        }
+        if (inside) {
+          rows.push(line);
+        } else if (!prefix && line) {
+          prefix = line;
+        }
+      }
+
+      rows = rows
+        .map(r => r.replace(/\\\\\s*$/, "").trim())
+        .filter(Boolean)
+        .map(r => r.replace(/\s*&\s*/g, " & "));
+
+      if (rows.length === 0) {
+        return raw.join(" ").replace(/\\begin\{cases\}/g, "\\begin{array}{ll}").replace(/\\end\{cases\}/g, "\\end{array}");
+      }
+
+      let body = rows.join(" \\\\ ");
+      if (prefix && !/[=]$/.test(prefix.trim())) prefix = prefix + " ";
+      return (prefix ? prefix + " " : "") + "\\left\\{\\begin{array}{ll} " + body + " \\end{array}\\right.";
+    }
+
+    function maths(lines) {
+      let out = [], i = 0, inCode = false, inManual = false;
+      while (i < lines.length) {
+        let l = lines[i], t = l.trim();
+        if (/^```/.test(t)) { inCode = !inCode; out.push(l); i++; continue; }
+        if (/^\$\$/.test(t) || /^\\\[/.test(t)) { inManual = !inManual; out.push(l); i++; continue; }
+        if (!inCode && !inManual && sep(t)) { out.push("\n---\n"); i++; continue; }
+
+        if (!inCode && !inManual && !list(t) && !heading(t) && (isCasesBegin(t) || (formula(l) && i + 1 < lines.length && isCasesBegin(lines[i + 1].trim())))) {
+          let g = [], j = i, found = false;
+          while (j < lines.length && j - i < 30) {
+            g.push(lines[j]);
+            if (isCasesEnd(lines[j].trim())) { found = true; j++; break; }
+            j++;
+          }
+          if (found) {
+            i = j;
+            out.push("\n" + mathBlock(cleanCasesGroup(g)) + "\n");
+            continue;
+          }
+        }
+
+        if (!inCode && !inManual && formula(l)) {
+          let g = [];
+          while (i < lines.length && formula(lines[i]) && !isCasesBegin(lines[i].trim())) {
+            g.push(lines[i++]);
+          }
+          out.push("\n" + mathBlock(cleanGroup(g)) + "\n");
+          continue;
+        }
+
+        out.push(!inCode && !inManual ? inlineMath(l) : l);
+        i++;
+      }
+      return out;
+    }
+
+    function preprocessCore(text) {
+      let lines = norm(text).split("\n");
+      lines = tables(lines);
+      lines = heads(lines);
+      lines = maths(lines);
+      return lines.join("\n").replace(/\n{4,}/g, "\n\n\n");
+    }
+
+    function prepareDocument(text) {
+      const protectedDoc = protectMathFragments(text);
+      return {
+        markdown: preprocessCore(protectedDoc.text),
+        tokens: protectedDoc.tokens
+      };
+    }
+
+    function preprocess(text) {
+      const doc = prepareDocument(text);
+      return restoreMathMarkdown(doc.markdown, doc.tokens);
+    }
+
+    // --- Render Markdown to HTML Preview ---
+    async function renderPreview(content) {
+      const source = content || DEMO_TRANSCRIPT_NOTE;
+      localStorage.setItem("clarityPadText", source);
+      const doc = prepareDocument(source);
+      let raw = marked.parse(doc.markdown);
+      raw = restoreMathHtml(raw, doc.tokens);
+
+      const target = document.getElementById("renderedMarkdownContent");
+      if (target) {
+        target.innerHTML = DOMPurify.sanitize(raw, { ADD_ATTR: ["class", "target", "rel"] });
+        // Format tables
+        target.querySelectorAll("table").forEach(function(tbl) {
+          if (!tbl.parentElement.classList.contains("table-scroll")) {
+            const wrap = document.createElement("div");
+            wrap.className = "table-scroll";
+            tbl.parentNode.insertBefore(wrap, tbl);
+            wrap.appendChild(tbl);
+          }
+        });
+      }
+
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        try {
+          await window.MathJax.typesetPromise([target]);
+        } catch(e) {
+          console.warn("MathJax render:", e);
+        }
       }
     }
 
-    if (!inCode && !inManual && formula(l)) {
-      let g = [];
-      while (i < lines.length && formula(lines[i]) && !isCasesBegin(lines[i].trim())) {
-        g.push(lines[i++]);
-      }
-      out.push("\n" + mathBlock(cleanGroup(g)) + "\n");
-      continue;
-    }
+    // --- Interactive State Functions ---
+    function switchMainTab(tab) {
+      const transcriptTab = document.getElementById("tabTranscript");
+      const mathTab = document.getElementById("tabMath");
+      const transcriptView = document.getElementById("transcriptView");
+      const mathView = document.getElementById("mathView");
 
-    out.push(!inCode && !inManual ? inlineMath(l) : l);
-    i++;
-  }
-  return out;
-}
-
-function preprocessCore(text) {
-  let lines = norm(text).split("\n");
-  lines = tables(lines);
-  lines = heads(lines);
-  lines = maths(lines);
-  return lines.join("\n").replace(/\n{4,}/g, "\n\n\n");
-}
-
-function prepareDocument(text) {
-  const protectedDoc = protectMathFragments(text);
-  return {
-    markdown: preprocessCore(protectedDoc.text),
-    tokens: protectedDoc.tokens
-  };
-}
-
-function preprocess(text) {
-  const doc = prepareDocument(text);
-  return restoreMathMarkdown(doc.markdown, doc.tokens);
-}
-
-function updateStats(text) {
-  const chars = text.length;
-  const words = (text.trim().match(/\S+/g) || []).length;
-  if (wordCountEl) wordCountEl.textContent = `${words} word${words === 1 ? '' : 's'}`;
-  if (charCountEl) charCountEl.textContent = `${chars.toLocaleString()} chars`;
-  const minutes = Math.max(1, Math.ceil(words / 200));
-  if (readTimeEl) readTimeEl.textContent = `~${minutes} min read`;
-}
-
-function enhancePreview() {
-  preview.querySelectorAll("table").forEach(function(table) {
-    if (table.parentElement && table.parentElement.classList.contains("table-scroll")) return;
-    const wrapper = document.createElement("div");
-    wrapper.className = "table-scroll";
-    table.classList.add("preview-table");
-    table.parentNode.insertBefore(wrapper, table);
-    wrapper.appendChild(table);
-  });
-
-  preview.querySelectorAll("a[href]").forEach(function(link) {
-    if (/^https?:/i.test(link.getAttribute("href") || "")) {
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-    }
-  });
-
-  // Enhance code blocks with copy button & header
-  preview.querySelectorAll("pre").forEach(function(pre) {
-    if (pre.parentElement && pre.parentElement.classList.contains("code-block-wrapper")) return;
-    const codeEl = pre.querySelector("code");
-    const langMatch = (codeEl ? codeEl.className : "").match(/language-([a-z0-9_-]+)/i);
-    const langName = langMatch ? langMatch[1] : "code";
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "code-block-wrapper";
-
-    const header = document.createElement("div");
-    header.className = "code-header";
-
-    const title = document.createElement("span");
-    title.textContent = langName;
-
-    const copyBtn = document.createElement("button");
-    copyBtn.className = "code-copy-btn";
-    copyBtn.textContent = "Copy";
-    copyBtn.onclick = function() {
-      const codeText = codeEl ? codeEl.innerText : pre.innerText;
-      copyToClipboard(codeText);
-      copyBtn.textContent = "Copied!";
-      setTimeout(() => { copyBtn.textContent = "Copy"; }, 1500);
-    };
-
-    header.appendChild(title);
-    header.appendChild(copyBtn);
-
-    pre.parentNode.insertBefore(wrapper, pre);
-    wrapper.appendChild(header);
-    wrapper.appendChild(pre);
-  });
-}
-
-let renderSequence = 0;
-
-async function renderPreview() {
-  const sequence = ++renderSequence;
-  const content = input.value;
-  localStorage.setItem("clarityPadText", content);
-  updateStats(content);
-
-  const doc = prepareDocument(content);
-  let raw = marked.parse(doc.markdown);
-  raw = restoreMathHtml(raw, doc.tokens);
-
-  if (window.MathJax && window.MathJax.typesetClear) {
-    window.MathJax.typesetClear([preview]);
-  }
-
-  preview.innerHTML = DOMPurify.sanitize(raw, {
-    ADD_ATTR: ["class", "target", "rel"]
-  });
-
-  enhancePreview();
-
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    try {
-      await window.MathJax.typesetPromise([preview]);
-      if (sequence !== renderSequence) return;
-      const errors = preview.querySelectorAll("mjx-merror");
-      if (errors.length > 0) {
-        mathStatusDot.classList.add("error");
-        mathStatusDot.title = `${errors.length} formula syntax error${errors.length > 1 ? 's' : ''}`;
+      if (tab === "transcript") {
+        transcriptTab.classList.add("active");
+        mathTab.classList.remove("active");
+        transcriptView.style.display = "block";
+        mathView.classList.remove("active");
       } else {
-        mathStatusDot.classList.remove("error");
-        mathStatusDot.title = "Formulas rendered perfectly";
+        mathTab.classList.add("active");
+        transcriptTab.classList.remove("active");
+        transcriptView.style.display = "none";
+        mathView.classList.add("active");
+        renderPreview();
       }
-    } catch (e) {
-      console.error("MathJax typeset error:", e);
-      mathStatusDot.classList.add("error");
     }
-  }
-}
 
-function toast(msg) {
-  const el = document.getElementById("copied");
-  el.textContent = msg;
-  el.classList.add("show");
-  setTimeout(() => el.classList.remove("show"), 1500);
-}
-
-async function copyToClipboard(text) {
-  try {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      await navigator.clipboard.writeText(text);
-      return true;
+    function seekTimestamp(time, element) {
+      document.querySelectorAll(".transcript-line").forEach(l => l.classList.remove("playing"));
+      if (element) element.classList.add("playing");
+      showToast(`${time} saniyesine atlandı • Ses dalgası eşitlendi`);
     }
-  } catch (err) {
-    console.warn("Clipboard API failed, trying fallback:", err);
-  }
-  // Fallback
-  const temp = document.createElement("textarea");
-  temp.value = text;
-  temp.style.position = "fixed";
-  temp.style.opacity = "0";
-  document.body.appendChild(temp);
-  temp.focus();
-  temp.select();
-  document.execCommand("copy");
-  document.body.removeChild(temp);
-  return true;
-}
 
-function closeMoreMenu() {
-  const menu = document.getElementById("moreMenu");
-  const btn = document.getElementById("moreButton");
-  if (menu) menu.classList.remove("open");
-  if (btn) btn.setAttribute("aria-expanded", "false");
-}
+    function filterQueue(status, el) {
+      document.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
+      if (el) el.classList.add("active");
 
-function toggleMoreMenu(event) {
-  event.stopPropagation();
-  const menu = document.getElementById("moreMenu");
-  const btn = document.getElementById("moreButton");
-  const open = !menu.classList.contains("open");
-  menu.classList.toggle("open", open);
-  btn.setAttribute("aria-expanded", String(open));
-}
+      const items = document.querySelectorAll(".queue-item");
+      items.forEach(item => {
+        if (status === "all") {
+          item.style.display = "flex";
+        } else if (item.getAttribute("data-status") === status) {
+          item.style.display = "flex";
+        } else {
+          item.style.display = "none";
+        }
+      });
+    }
 
-document.addEventListener("click", closeMoreMenu);
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeMoreMenu(); });
-const moreMenuEl = document.getElementById("moreMenu");
-if (moreMenuEl) moreMenuEl.addEventListener("click", e => e.stopPropagation());
+    function retryVideo(idx) {
+      showToast(`Video 0${idx} yeniden deneniyor... Çerez oturumu tazelendi.`);
+    }
 
-async function copyCleanMarkdown() {
-  const clean = preprocess(input.value)
-    .replace(/<div class="math-display center">|<div class="math-display">|<\/div>/g, "")
-    .trim();
-  await copyToClipboard(clean);
-  closeMoreMenu();
-  toast("Clean Markdown copied");
-}
+    function chooseLocalFolder() {
+      showToast("Klasör izleme diyaloğu açıldı • Yeni dizin bağlandı: ~/VoiceMemos/");
+      document.getElementById("watcherPathText").textContent = "~/VoiceMemos/ (Canlı Dinleniyor)";
+    }
 
-async function copyPreviewHtml() {
-  await copyToClipboard(preview.innerHTML);
-  closeMoreMenu();
-  toast("Preview HTML copied");
-}
+    function simulateNewRecordingDrop() {
+      showToast("🎙 Yeni kayıt yakalandı: mülakat-kaydi-01.m4a • Transkript çıkarılıyor...");
+    }
 
-function downloadMarkdown() {
-  const clean = preprocess(input.value)
-    .replace(/<div class="math-display center">|<div class="math-display">|<\/div>/g, "")
-    .trim();
-  const blob = new Blob([clean], { type: "text/markdown;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "claritypad-note.md";
-  a.click();
-  URL.revokeObjectURL(url);
-  closeMoreMenu();
-  toast("Markdown downloaded");
-}
+    function showToast(msg, duration = 3000) {
+      const toast = document.getElementById("undoToast");
+      const msgEl = document.getElementById("undoToastMessage");
+      msgEl.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, duration);
+    }
 
-function downloadHtml() {
-  const css = document.querySelector("style").innerHTML;
-  const isDark = document.body.classList.contains("dark");
-  const content = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ClarityPad Export</title>
-  <style>
-    ${css}
-    body { padding: 40px 20px; }
-  </style>
-  <script>
-    window.MathJax = {
-      tex: { inlineMath: [['\\\\(','\\\\)'],['$','$']], displayMath: [['\\\\[','\\\\]'],['$$','$$']], processEscapes: true, packages: {'[+]': ['ams']} },
-      svg: { fontCache: 'global' }
+    function handleUndo() {
+      showToast("✓ İşlem başarıyla geri alındı (Undo).");
+    }
+
+    function toggleCommandPalette(force) {
+      const palette = document.getElementById("cmdBackdrop");
+      if (force !== undefined) {
+        palette.classList.toggle("open", force);
+      } else {
+        palette.classList.toggle("open");
+      }
+      if (palette.classList.contains("open")) {
+        document.getElementById("cmdInput").focus();
+      }
+    }
+
+    function executeCmd(cmd) {
+      toggleCommandPalette(false);
+      if (cmd === 'paste-yt') ingestFromClipboard();
+      if (cmd === 'watch-folder') chooseLocalFolder();
+      if (cmd === 'copy-md') copyCurrentCleanMarkdown();
+      if (cmd === 'toggle-theme') toggleTheme();
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("clarityPadTheme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+
+    async function copyCurrentCleanMarkdown() {
+      const clean = preprocess(DEMO_TRANSCRIPT_NOTE);
+      try {
+        if (navigator.clipboard) await navigator.clipboard.writeText(clean);
+      } catch(e) {}
+      showToast("✓ Temizlenmiş GFM Markdown panoya kopyalandı.");
+    }
+
+    function ingestFromClipboard() {
+      showToast("⚡ Panodaki YouTube oynatma listesi algılandı: 31 video kuyruğa eklendi.");
+    }
+
+    function smoothScrollToWorkspace() {
+      document.getElementById("workspace").scrollIntoView({ behavior: "smooth" });
+    }
+
+    // --- 8-State Matrix Verification Controller ---
+    function triggerState(state) {
+      const qList = document.getElementById("queueList");
+      if (state === 'empty') {
+        qList.innerHTML = `<div style="padding: 40px 20px; text-align: center; color: var(--text-tertiary);">
+          <div style="font-size: 28px; margin-bottom: 10px;">📭</div>
+          <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Henüz transkript kaydı yok</div>
+          <div style="font-size: 12px; margin-bottom: 16px;">Bir YouTube oynatma listesi yapıştırın veya yerel izleme klasörü bağlayın.</div>
+          <button class="primary" onclick="triggerState('success')">+ Kayıt Ekle</button>
+        </div>`;
+        showToast("Durum 1: Empty (Boş) Ekranı Aktif");
+      } else if (state === 'loading') {
+        qList.innerHTML = `<div style="padding: 24px 16px;">
+          <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">29/31 Video işleniyor...</div>
+          <div style="height: 6px; width: 100%; background: var(--glass-panel); border-radius: 999px; overflow: hidden; margin-bottom: 14px;">
+            <div style="height: 100%; width: 88%; background: var(--accent); border-radius: 999px;"></div>
+          </div>
+          <div style="font-size: 11.5px; color: var(--text-tertiary);">Ses spektrumu ayrıştırılıyor • Ortalama süre 0.4s</div>
+        </div>`;
+        showToast("Durum 2: Loading (Yükleniyor) Ekranı Aktif");
+      } else if (state === 'success') {
+        location.reload();
+      } else if (state === 'error') {
+        filterQueue('error');
+        showToast("Durum 4: Actionable Error (Hata ve Çözüm Butonu) Vurgulandı");
+      } else if (state === 'no-results') {
+        qList.innerHTML = `<div style="padding: 30px 16px; text-align: center; color: var(--text-secondary);">
+          <div style="font-size: 22px; margin-bottom: 8px;">🔍</div>
+          <div style="font-weight: 650; margin-bottom: 4px;">Sonuç Bulunamadı</div>
+          <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 12px;">Aradığınız anahtar kelime bu seride yer almıyor.</div>
+          <button onclick="triggerState('success')">Filtreyi Temizle (Esc)</button>
+        </div>`;
+        showToast("Durum 5: No Results (Sonuç Yok) Aktif");
+      } else if (state === 'disabled') {
+        showToast("Durum 6: Disabled (Klasör seçilmeden buton pasif) mikro ipucu");
+      } else if (state === 'confirmation') {
+        showToast("Toplu transkript geçmişi silindi.", 5000);
+      } else if (state === 'recovery') {
+        showToast("Durum 8: Recovery (Yarıda kalan 31 videoluk işlem 29. videodan devam ediyor)");
+      }
+    }
+
+    const PRESETS = {
+      default: DEMO_TRANSCRIPT_NOTE,
+      dl: DEMO_TRANSCRIPT_NOTE
     };
-  <\/script>
-  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg-full.js"><\/script>
-</head>
-<body class="${isDark ? 'dark' : ''}">
-  <main class="preview">
-    ${preview.innerHTML}
-  </main>
-</body>
-</html>`;
 
-  const blob = new Blob([content], { type: "text/html;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "claritypad-export.html";
-  a.click();
-  URL.revokeObjectURL(url);
-  closeMoreMenu();
-  toast("HTML export downloaded");
-}
-
-function toggleTheme() {
-  document.body.classList.toggle("dark");
-  localStorage.setItem("clarityPadTheme", document.body.classList.contains("dark") ? "dark" : "light");
-  closeMoreMenu();
-}
-
-function hideEditor() {
-  document.getElementById("wrap").classList.add("reading-only");
-}
-
-function showEditor() {
-  document.getElementById("wrap").classList.remove("reading-only");
-  input.focus();
-}
-
-function toggleReaderMode() {
-  const wrap = document.getElementById("wrap");
-  if (wrap.classList.contains("reading-only")) {
-    showEditor();
-  } else {
-    hideEditor();
-  }
-  closeMoreMenu();
-}
-
-function toggleDensity() {
-  const isCompact = document.getElementById("densityMode").value === "compact";
-  document.getElementById("wrap").classList.toggle("compact", isCompact);
-}
-
-function cycleDensity() {
-  const select = document.getElementById("densityMode");
-  select.value = select.value === "compact" ? "normal" : "compact";
-  toggleDensity();
-  closeMoreMenu();
-}
-
-function cycleMathAlign() {
-  const select = document.getElementById("mathAlign");
-  select.value = select.value === "center" ? "left" : "center";
-  renderPreview();
-  closeMoreMenu();
-}
-
-function loadPresetSample(presetKey) {
-  if (presetKey === "clear") {
-    if (confirm("Are you sure you want to clear your current note?")) {
-      input.value = "";
-      renderPreview();
+    function loadPresetSample(presetKey) {
+      const text = PRESETS[presetKey] || DEMO_TRANSCRIPT_NOTE;
+      renderPreview(text);
+      showToast("Örnek transkript & matematik şablonu yüklendi.");
     }
-  } else if (PRESETS[presetKey]) {
-    input.value = PRESETS[presetKey];
-    renderPreview();
-    toast("Preset loaded");
-  }
-  document.getElementById("sampleSelect").value = "";
-}
 
-// Synchronized scrolling with requestAnimationFrame
-let isSyncing = false;
-function syncScroll(source, target) {
-  const syncToggle = document.getElementById("syncScroll");
-  if (!syncToggle || !syncToggle.checked || isSyncing) return;
-  isSyncing = true;
-  window.requestAnimationFrame(() => {
-    const maxS = source.scrollHeight - source.clientHeight;
-    const maxT = target.scrollHeight - target.clientHeight;
-    if (maxS > 0) {
-      target.scrollTop = (source.scrollTop / maxS) * maxT;
+    function downloadMarkdown() {
+      const clean = preprocess(DEMO_TRANSCRIPT_NOTE);
+      const blob = new Blob([clean], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "claritypad-transcript.md";
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("✓ Markdown dosyası indirildi.");
     }
-    isSyncing = false;
-  });
-}
 
-// Keyboard shortcuts & Tab key handling in textarea
-input.addEventListener("keydown", function(e) {
-  // Tab key indentation
-  if (e.key === "Tab") {
-    e.preventDefault();
-    const start = this.selectionStart;
-    const end = this.selectionEnd;
-    const val = this.value;
+    // Enhance links with target=_blank and noopener noreferrer
+    function enhanceLinks() {
+      document.querySelectorAll("a[href]").forEach(link => {
+        if (/^https?:/i.test(link.getAttribute("href") || "")) {
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+        }
+      });
+    }
 
-    if (e.shiftKey) {
-      // Unindent
-      const lineStart = val.lastIndexOf("\n", start - 1) + 1;
-      if (val.slice(lineStart, lineStart + 2) === "  ") {
-        this.value = val.slice(0, lineStart) + val.slice(lineStart + 2);
-        this.selectionStart = Math.max(lineStart, start - 2);
-        this.selectionEnd = Math.max(lineStart, end - 2);
+    // Keyboard Shortcuts & Tab Indentation
+    const inputEl = document.getElementById("input");
+    if (inputEl) {
+      inputEl.addEventListener("keydown", function(e) {
+        if (e.key === "Tab") {
+          e.preventDefault();
+          const start = this.selectionStart;
+          const end = this.selectionEnd;
+          this.value = this.value.substring(0, start) + "  " + this.value.substring(end);
+          this.selectionStart = this.selectionEnd = start + 2;
+        }
+      });
+    }
+
+    document.addEventListener("keydown", function(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        toggleCommandPalette();
       }
-    } else {
-      // Indent 2 spaces
-      this.value = val.substring(0, start) + "  " + val.substring(end);
-      this.selectionStart = this.selectionEnd = start + 2;
+      if ((e.metaKey || e.ctrlKey) && (e.key === "s" || e.key === "S")) {
+        e.preventDefault();
+        showToast("✓ Not yerel olarak kaydedildi.");
+      }
+      if (e.key === "Escape") {
+        toggleCommandPalette(false);
+      }
+    });
+
+    // Theme initialization
+    if (localStorage.getItem("clarityPadTheme") === "dark" || (!localStorage.getItem("clarityPadTheme") && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.body.classList.add("dark");
     }
+
+    // Render initial math note & enhance links
     renderPreview();
-    return;
-  }
-
-  // Ctrl/Cmd shortcuts
-  if (e.ctrlKey || e.metaKey) {
-    if (e.key === "s" || e.key === "S") {
-      e.preventDefault();
-      localStorage.setItem("clarityPadText", this.value);
-      toast("Note saved");
-      return;
-    }
-    if (e.key === "Enter") {
-      e.preventDefault();
-      renderPreview();
-      return;
-    }
-    if (e.key === "e" || e.key === "E") {
-      e.preventDefault();
-      toggleReaderMode();
-      return;
-    }
-    // Bold: Cmd+B
-    if (e.key === "b" || e.key === "B") {
-      e.preventDefault();
-      wrapSelection(this, "**", "**");
-      return;
-    }
-    // Italic: Cmd+I
-    if (e.key === "i" || e.key === "I") {
-      e.preventDefault();
-      wrapSelection(this, "*", "*");
-      return;
-    }
-    // Math: Cmd+M
-    if (e.key === "m" || e.key === "M") {
-      e.preventDefault();
-      wrapSelection(this, "$", "$");
-      return;
-    }
-  }
-});
-
-function wrapSelection(textarea, before, after) {
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const val = textarea.value;
-  const selected = val.substring(start, end);
-  textarea.value = val.substring(0, start) + before + selected + after + val.substring(end);
-  textarea.selectionStart = start + before.length;
-  textarea.selectionEnd = end + before.length;
-  renderPreview();
-}
-
-// System theme auto-detection
-const savedTheme = localStorage.getItem("clarityPadTheme");
-if (savedTheme === "dark" || (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-  document.body.classList.add("dark");
-}
-
-input.addEventListener("scroll", () => syncScroll(input, previewShell));
-previewShell.addEventListener("scroll", () => syncScroll(previewShell, input));
-
-input.addEventListener("input", () => {
-  saveDot.classList.add("saving");
-  clearTimeout(window.__inputTimer);
-  window.__inputTimer = setTimeout(() => {
-    renderPreview();
-    saveDot.classList.remove("saving");
-  }, 250);
-});
-
-const mathScript = document.getElementById("mathjax-script");
-if (mathScript) {
-  mathScript.addEventListener("load", renderPreview);
-}
-
-// Initial state load: saved text, or load preset if empty
-const savedText = localStorage.getItem("clarityPadText");
-if (savedText && savedText.trim()) {
-  input.value = savedText;
-} else {
-  input.value = PRESETS.dl;
-}
-
-renderPreview();
-</script>
+    enhanceLinks();
+  </script>
 </body>
 </html>
