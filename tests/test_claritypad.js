@@ -258,17 +258,17 @@ function runAllTests(htmlFilePath) {
   test("H/2 capsule geometry (border-radius: 9999px) is applied",
     html.includes("border-radius: 9999px")
   );
-  test("Zero-touch watcher telemetry and monitored path are present",
-    html.includes("watcher-pill") && html.includes("~/Recordings")
+  test("Action-oriented telemetry bar with formula & syntax counts is present",
+    html.includes("telemetry-bar") && html.includes("teleFormulasCount")
   );
-  test("Action-oriented error handling with retry & cookie feedback is present",
-    html.includes("FAILED: İndirilemedi") && html.includes("Yeniden Dene")
+  test("Dual-pane split view with editor and live preview is present",
+    html.includes("input-pane") && html.includes("preview-shell")
   );
   test("Zorunlu 8 Durum Matrisi (8-State Matrix) controller is present",
     html.includes("triggerState") && html.includes("1. Empty") && html.includes("7. Confirmation (Undo)")
   );
-  test("Asymmetric hero contains 2 overlapping floating telemetry cards",
-    html.includes("floating-snippet") && html.includes("snippet-watcher") && html.includes("snippet-batch")
+  test("Reader Mode (full width distraction-free view) is implemented",
+    html.includes("toggleReaderMode") && html.includes("reading-only") && html.includes("collapse-editor")
   );
   test("Command+K floating palette is implemented",
     html.includes("toggleCommandPalette") && html.includes("cmd-backdrop")
