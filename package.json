@@ -1,0 +1,28 @@
+{
+  "name": "claritypad",
+  "version": "4.1.0",
+  "description": "The Apple-grade Math & Markdown Notebook for AI outputs (ChatGPT, Claude, Gemini, DeepSeek)",
+  "main": "index.html",
+  "scripts": {
+    "test": "node tests/test_claritypad.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Akifulutas/claritypad.git"
+  },
+  "keywords": [
+    "markdown",
+    "latex",
+    "mathjax",
+    "ai",
+    "chatgpt",
+    "claude",
+    "gemini",
+    "deepseek",
+    "notes",
+    "apple-notes",
+    "reader"
+  ],
+  "author": "Akif Ulutas & ClarityPad Contributors",
+  "license": "MIT"
+}

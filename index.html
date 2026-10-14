@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClarityPad — The Clean Math & Markdown Notebook for AI Outputs</title>
+  <meta name="description" content="Turn messy AI responses, LaTeX formulas, and unformatted tables from ChatGPT, Claude, and Gemini into clean, beautifully rendered notes with live preview, math auto-detection, and one-click export." />
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true,
+        processEnvironments: true,
+        maxBuffer: 40 * 1024,
+        packages: {'[+]': ['ams', 'color', 'newcommand']}
+      },
+      svg: { fontCache: 'global' },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script id="mathjax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg-full.js"></script>
+
+  <style>
+    :root {
+      --bg:#f5f5f7;
+      --surface:rgba(255,255,255,.78);
+      --surface-solid:#ffffff;
+      --surface-raised:#fbfbfd;
+      --text:#1d1d1f;
+      --muted:#6e6e73;
+      --border:rgba(0,0,0,.10);
+      --border-strong:rgba(0,0,0,.18);
+      --accent:#0071e3;
+      --accent-pressed:#0062c4;
+      --input:#ffffff;
+      --code:#f2f2f7;
+      --code-block:#0d1117;
+      --code-block-text:#e6edf3;
+      --shadow:0 18px 55px rgba(0,0,0,.08);
+      --shadow-soft:0 8px 28px rgba(0,0,0,.06);
+      --radius:18px;
+      --max:980px;
+      color-scheme:light;
+    }
+
+    .dark {
+      --bg:#0f0f11;
+      --surface:rgba(28,28,30,.78);
+      --surface-solid:#1c1c1e;
+      --surface-raised:#242426;
+      --text:#f5f5f7;
+      --muted:#a1a1a6;
+      --border:rgba(255,255,255,.12);
+      --border-strong:rgba(255,255,255,.20);
+      --accent:#0a84ff;
+      --accent-pressed:#409cff;
+      --input:#151517;
+      --code:#2c2c2e;
+      --code-block:#161b22;
+      --code-block-text:#f0f6fc;
+      --shadow:0 18px 55px rgba(0,0,0,.36);
+      --shadow-soft:0 8px 28px rgba(0,0,0,.26);
+      color-scheme:dark;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 12% -10%, rgba(0,113,227,.12), transparent 34%),
+        radial-gradient(circle at 88% 0%, rgba(175,82,222,.10), transparent 28%),
+        var(--bg);
+      color:var(--text);
+      font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+      transition:background-color .25s ease, color .25s ease;
+    }
+
+    .app-header{
+      position:sticky;
+      top:0;
+      z-index:30;
+      padding:10px 18px;
+      border-bottom:1px solid var(--border);
+      background:var(--surface);
+      backdrop-filter:saturate(180%) blur(22px);
+      -webkit-backdrop-filter:saturate(180%) blur(22px);
+    }
+
+    .topbar{
+      max-width:1440px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:170px;
+      user-select:none;
+    }
+
+    .brand-mark{
+      width:32px;
+      height:32px;
+      display:grid;
+      place-items:center;
+      border-radius:10px;
+      background:linear-gradient(135deg, #0071e3, #af52de);
+      border:1px solid rgba(255,255,255,.2);
+      box-shadow:var(--shadow-soft);
+      color:#ffffff;
+      font-weight:850;
+      font-size:15px;
+      letter-spacing:-.05em;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:16px;
+      line-height:1;
+      font-weight:760;
+      letter-spacing:-.02em;
+    }
+
+    .brand-badge{
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      padding:2px 6px;
+      border-radius:999px;
+      background:color-mix(in srgb, var(--accent) 15%, transparent);
+      color:var(--accent);
+      font-weight:700;
+    }
+
+    .toolbar{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:8px;
+      min-width:0;
+    }
+
+    button,select,label.toggle{
+      appearance:none;
+      border:1px solid var(--border);
+      background:var(--surface-solid);
+      color:var(--text);
+      border-radius:999px;
+      padding:8px 13px;
+      font-size:13px;
+      line-height:1;
+      cursor:pointer;
+      transition:
+        transform .16s ease,
+        background .16s ease,
+        border-color .16s ease,
+        box-shadow .16s ease,
+        color .16s ease;
+    }
+
+    button:hover,select:hover,label.toggle:hover{
+      transform:translateY(-1px);
+      border-color:var(--border-strong);
+      box-shadow:0 6px 16px rgba(0,0,0,.06);
+      background:var(--surface-raised);
+    }
+
+    button:active,label.toggle:active{
+      transform:translateY(0) scale(.98);
+      box-shadow:none;
+    }
+
+    button:focus-visible,select:focus-visible,label.toggle:focus-visible{
+      outline:3px solid color-mix(in srgb, var(--accent) 30%, transparent);
+      outline-offset:2px;
+    }
+
+    button.primary{
+      background:var(--accent);
+      border-color:var(--accent);
+      color:#ffffff;
+      font-weight:700;
+      box-shadow:0 6px 18px color-mix(in srgb, var(--accent) 26%, transparent);
+    }
+
+    button.primary:hover{
+      background:var(--accent-pressed);
+      border-color:var(--accent-pressed);
+    }
+
+    select{
+      padding-right:28px;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position:
+        calc(100% - 15px) 50%,
+        calc(100% - 10px) 50%;
+      background-size:5px 5px,5px 5px;
+      background-repeat:no-repeat;
+    }
+
+    label.toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      user-select:none;
+      white-space:nowrap;
+    }
+
+    label.toggle input{
+      accent-color:var(--accent);
+      margin:0;
+    }
+
+    .menu-wrap{
+      position:relative;
+    }
+
+    .icon-btn{
+      min-width:36px;
+      height:36px;
+      display:grid;
+      place-items:center;
+      padding:0;
+      font-size:18px;
+    }
+
+    .menu{
+      position:absolute;
+      top:44px;
+      right:0;
+      min-width:250px;
+      padding:7px;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:var(--surface);
+      backdrop-filter:saturate(180%) blur(24px);
+      -webkit-backdrop-filter:saturate(180%) blur(24px);
+      box-shadow:var(--shadow);
+      opacity:0;
+      transform:translateY(-6px) scale(.98);
+      pointer-events:none;
+      transition:opacity .16s ease, transform .16s ease;
+      z-index:100;
+    }
+
+    .menu.open{
+      opacity:1;
+      transform:translateY(0) scale(1);
+      pointer-events:auto;
+    }
+
+    .menu button{
+      width:100%;
+      justify-content:flex-start;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      border:0;
+      border-radius:11px;
+      background:transparent;
+      padding:9px 12px;
+      box-shadow:none;
+      transform:none;
+      font-size:13px;
+    }
+
+    .menu button:hover{
+      background:color-mix(in srgb, var(--text) 7%, transparent);
+      box-shadow:none;
+      transform:none;
+    }
+
+    .menu-separator{
+      height:1px;
+      margin:6px 7px;
+      background:var(--border);
+    }
+
+    .menu-header{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:var(--muted);
+      padding:6px 12px 2px;
+      font-weight:700;
+    }
+
+    .wrap{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+      gap:14px;
+      min-height:calc(100vh - 61px);
+      padding:14px;
+    }
+
+    .pane{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      overflow:hidden;
+      box-shadow:var(--shadow-soft);
+      backdrop-filter:saturate(180%) blur(18px);
+      -webkit-backdrop-filter:saturate(180%) blur(18px);
+      transition:all .2s ease;
+    }
+
+    .pane-title{
+      height:42px;
+      padding:0 15px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid var(--border);
+      background:color-mix(in srgb, var(--surface-solid) 70%, transparent);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:720;
+      letter-spacing:.01em;
+    }
+
+    .pane-title-left, .pane-title-right{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width:0;
+    }
+
+    .status-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#34c759;
+      box-shadow:0 0 0 4px color-mix(in srgb, #34c759 16%, transparent);
+      transition:background-color .2s ease, box-shadow .2s ease;
+    }
+
+    .status-dot.error{
+      background:#ff3b30;
+      box-shadow:0 0 0 4px color-mix(in srgb, #ff3b30 20%, transparent);
+    }
+
+    .status-dot.saving{
+      background:#ff9500;
+      box-shadow:0 0 0 4px color-mix(in srgb, #ff9500 20%, transparent);
+    }
+
+    .collapse-editor{
+      width:26px;
+      height:26px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      padding:0;
+      font-size:15px;
+      line-height:1;
+      color:var(--muted);
+      background:transparent;
+      border:1px solid transparent;
+      box-shadow:none;
+      transform:none;
+    }
+
+    .collapse-editor:hover{
+      color:var(--text);
+      background:color-mix(in srgb, var(--text) 7%, transparent);
+      border-color:var(--border);
+      box-shadow:none;
+    }
+
+    .show-editor{
+      position:fixed;
+      left:18px;
+      top:76px;
+      z-index:24;
+      width:38px;
+      height:38px;
+      display:none;
+      place-items:center;
+      padding:0;
+      border-radius:50%;
+      font-size:20px;
+      background:var(--surface-solid);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow-soft);
+      cursor:pointer;
+    }
+
+    .wrap.reading-only ~ .show-editor{
+      display:grid;
+    }
+
+    textarea{
+      flex:1;
+      min-height:70vh;
+      width:100%;
+      resize:none;
+      border:0;
+      outline:none;
+      padding:18px;
+      background:var(--input);
+      color:var(--text);
+      font-size:14px;
+      line-height:1.65;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+    }
+
+    textarea::selection{
+      background:color-mix(in srgb, var(--accent) 26%, transparent);
+    }
+
+    .hint{
+      padding:9px 15px;
+      border-top:1px solid var(--border);
+      background:color-mix(in srgb, var(--surface-solid) 74%, transparent);
+      color:var(--muted);
+      font-size:12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .stats{
+      display:flex;
+      gap:12px;
+      font-size:11.5px;
+      white-space:nowrap;
+    }
+
+    .preview-shell{
+      overflow:auto;
+      flex:1;
+      background:var(--surface-solid);
+      scroll-behavior:smooth;
+    }
+
+    .preview{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:32px 36px 72px;
+      font-size:16px;
+      line-height:1.7;
+      color:var(--text);
+      overflow-wrap:break-word;
+      word-break:normal;
+      hyphens:auto;
+    }
+
+    .preview h1{
+      font-size:32px;
+      line-height:1.2;
+      margin:0 0 20px;
+      font-weight:780;
+      letter-spacing:-.035em;
+      border:0;
+    }
+
+    .preview h2{
+      font-size:24px;
+      line-height:1.25;
+      margin:32px 0 14px;
+      font-weight:740;
+      letter-spacing:-.025em;
+      border:0;
+    }
+
+    .preview h3{
+      font-size:19px;
+      line-height:1.35;
+      margin:24px 0 10px;
+      font-weight:700;
+      letter-spacing:-.015em;
+    }
+
+    .preview p{margin:12px 0}
+
+    .preview img,
+    .preview video,
+    .preview canvas{
+      display:block;
+      max-width:100%;
+      height:auto;
+      margin:20px auto;
+      border-radius:12px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .preview a{
+      color:var(--accent);
+      text-decoration:none;
+    }
+
+    .preview a:hover{text-decoration:underline}
+
+    .preview blockquote{
+      margin:16px 0;
+      padding:12px 18px;
+      border-left:3px solid var(--accent);
+      background:color-mix(in srgb, var(--accent) 7%, transparent);
+      border-radius:0 14px 14px 0;
+      color:color-mix(in srgb, var(--text) 90%, var(--muted));
+    }
+
+    .preview ul,.preview ol{
+      padding-left:24px;
+      margin:10px 0 16px;
+    }
+
+    .preview li{margin:5px 0}
+
+    .preview hr{
+      border:0;
+      border-top:1px solid var(--border);
+      margin:32px 0;
+    }
+
+    .preview table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      margin:16px 0 22px;
+      font-size:14.5px;
+      line-height:1.45;
+      border:1px solid var(--border);
+      border-radius:14px;
+      overflow:hidden;
+    }
+
+    .table-scroll{
+      width:100%;
+      margin:16px 0 22px;
+      overflow-x:auto;
+      overscroll-behavior-inline:contain;
+      border-radius:14px;
+    }
+
+    .table-scroll .preview-table,
+    .table-scroll table{
+      width:max-content;
+      min-width:100%;
+      margin:0;
+    }
+
+    .preview th,.preview td{
+      border-right:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+      padding:10px 14px;
+      vertical-align:top;
+    }
+
+    .preview th:last-child,.preview td:last-child{border-right:0}
+    .preview tr:last-child td{border-bottom:0}
+
+    .preview th{
+      background:var(--surface-raised);
+      font-weight:700;
+    }
+
+    .preview code{
+      background:var(--code);
+      padding:2px 6px;
+      border-radius:6px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:.90em;
+    }
+
+    .code-block-wrapper{
+      position:relative;
+      margin:18px 0;
+      border-radius:16px;
+      overflow:hidden;
+      background:var(--code-block);
+      border:1px solid var(--border);
+    }
+
+    .code-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:8px 14px;
+      background:rgba(255,255,255,.05);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      font-size:11.5px;
+      color:#8b949e;
+      font-family:ui-monospace,monospace;
+    }
+
+    .code-copy-btn{
+      background:rgba(255,255,255,.1);
+      border:0;
+      color:#c9d1d9;
+      border-radius:6px;
+      padding:3px 8px;
+      font-size:11px;
+      cursor:pointer;
+    }
+    .code-copy-btn:hover{
+      background:rgba(255,255,255,.2);
+      color:#ffffff;
+    }
+
+    .preview pre{
+      margin:0;
+      background:transparent;
+      color:var(--code-block-text);
+      padding:14px 16px;
+      overflow:auto;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:13.5px;
+      line-height:1.55;
+    }
+
+    .preview pre code{
+      padding:0;
+      background:transparent;
+      color:inherit;
+      white-space:pre;
+      overflow-wrap:normal;
+    }
+
+    .math-display{
+      margin:22px 0;
+      overflow-x:auto;
+      overflow-y:hidden;
+      overscroll-behavior-inline:contain;
+      -webkit-overflow-scrolling:touch;
+      padding:4px 0;
+    }
+
+    mjx-container[display="true"]{
+      margin:0!important;
+      padding:0!important;
+      overflow-x:auto;
+      overflow-y:hidden;
+    }
+
+    .preview mjx-container{
+      max-width:100%;
+      color:var(--text);
+    }
+
+    .preview .math-inline{
+      display:inline;
+      white-space:nowrap;
+    }
+
+    mjx-merror{
+      background:transparent!important;
+      color:#ff453a!important;
+      border:1px dashed #ff453a;
+      padding:2px 6px;
+      border-radius:6px;
+      font-size:13px;
+    }
+
+    .preview mjx-container[display="true"]{
+      min-width:max-content;
+    }
+
+    .preview mjx-container[jax="SVG"] svg{
+      max-width:none;
+      height:auto;
+    }
+
+    .math-display.center mjx-container[display="true"]{
+      text-align:center!important;
+    }
+
+    .reading-only{
+      grid-template-columns:1fr;
+    }
+
+    .reading-only .input-pane{
+      display:none;
+    }
+
+    .reading-only .preview{
+      max-width:920px;
+      padding-top:40px;
+    }
+
+    .reading-only .pane{
+      margin-left:44px;
+    }
+
+    .compact .preview{
+      font-size:14.5px;
+      line-height:1.55;
+      max-width:880px;
+      padding:22px 24px 60px;
+    }
+
+    .compact .preview h1{font-size:28px}
+    .compact .preview h2{font-size:21px;margin-top:24px}
+    .compact .preview h3{font-size:17px;margin-top:18px}
+    .compact .math-display{margin:16px 0}
+
+    .copied{
+      position:fixed;
+      right:20px;
+      bottom:20px;
+      background:rgba(28,28,30,.92);
+      color:#ffffff;
+      padding:10px 16px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:600;
+      z-index:999;
+      opacity:0;
+      pointer-events:none;
+      transform:translateY(8px);
+      transition:opacity .2s ease, transform .2s ease;
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      box-shadow:0 10px 30px rgba(0,0,0,.3);
+    }
+
+    .copied.show{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    @media(max-width:1080px){
+      .brand{min-width:auto}
+      .toolbar select.desktop-only,
+      .toolbar label.toggle.desktop-only{
+        display:none;
+      }
+    }
+
+    @media(max-width:820px){
+      .app-header{padding:10px 14px}
+      .brand h1{font-size:15px}
+      .brand-badge{display:none}
+      .wrap{
+        grid-template-columns:1fr;
+        padding:10px;
+        gap:10px;
+      }
+      .reading-only .pane{
+        margin-left:0;
+      }
+      .show-editor{
+        top:68px;
+        left:12px;
+      }
+      textarea{
+        min-height:45vh;
+        padding:14px;
+      }
+      .preview{
+        padding:20px 16px 60px;
+      }
+    }
+
+    @media print{
+      .app-header,.input-pane,.pane-title,.hint,.show-editor{display:none!important}
+      body{
+        background:#ffffff!important;
+        color:#111827!important;
+      }
+      .wrap{
+        display:block!important;
+        padding:0!important;
+      }
+      .pane{
+        border:0!important;
+        display:block!important;
+        box-shadow:none!important;
+        background:#ffffff!important;
+      }
+      .preview-shell{
+        overflow:visible!important;
+        background:#ffffff!important;
+      }
+      .preview{
+        color:#111827!important;
+        max-width:100%!important;
+        padding:0!important;
+      }
+      .preview mjx-container{
+        color:#111827!important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<header class="app-header">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">C</div>
+      <div>
+        <h1>ClarityPad</h1>
+      </div>
+      <span class="brand-badge">AI Math & Note</span>
+    </div>
+
+    <div class="toolbar">
+      <button class="primary" onclick="renderPreview()" title="Refresh preview (Cmd/Ctrl + Enter)">Refresh</button>
+
+      <select id="sampleSelect" onchange="loadPresetSample(this.value)" title="Load sample note">
+        <option value="" disabled selected>Presets...</option>
+        <option value="dl">AI & Deep Learning</option>
+        <option value="quantum">Quantum & Linear Algebra</option>
+        <option value="calculus">Calculus & Stats</option>
+        <option value="clear">Clear Note</option>
+      </select>
+
+      <select id="densityMode" class="desktop-only" onchange="toggleDensity()" title="Density layout">
+        <option value="normal">Comfort</option>
+        <option value="compact">Compact</option>
+      </select>
+
+      <select id="mathAlign" class="desktop-only" onchange="renderPreview()" title="Formula alignment">
+        <option value="left">Formula: Left</option>
+        <option value="center">Formula: Center</option>
+      </select>
+
+      <label class="toggle desktop-only" title="Synchronize editor and preview scrolling">
+        <input id="syncScroll" type="checkbox" checked>
+        Sync
+      </label>
+
+      <div class="menu-wrap">
+        <button class="icon-btn" id="moreButton" onclick="toggleMoreMenu(event)" aria-label="More actions" aria-expanded="false">…</button>
+        <div class="menu" id="moreMenu">
+          <div class="menu-header">Export & Copy</div>
+          <button onclick="copyCleanMarkdown()">⌘ Copy cleaned Markdown</button>
+          <button onclick="downloadMarkdown()">⇩ Download Markdown (.md)</button>
+          <button onclick="copyPreviewHtml()">⌥ Copy preview HTML</button>
+          <button onclick="downloadHtml()">⇩ Download HTML</button>
+          <button onclick="window.print()">⌁ Print / PDF</button>
+
+          <div class="menu-separator"></div>
+          <div class="menu-header">View & Appearance</div>
+          <button onclick="toggleReaderMode()">📖 Toggle Reader mode</button>
+          <button onclick="toggleTheme()">◐ Toggle Dark/Light</button>
+          <button onclick="cycleMathAlign()">📐 Toggle Formula Align</button>
+          <button onclick="cycleDensity()">⇲ Toggle Density</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="wrap">
+  <section class="pane input-pane">
+    <div class="pane-title">
+      <div class="pane-title-left">
+        <button class="collapse-editor" onclick="hideEditor()" title="Hide editor (Reader mode)" aria-label="Hide editor">‹</button>
+        <span>Input (AI Response / Markdown)</span>
+      </div>
+      <div class="pane-title-right">
+        <span class="status-dot" id="saveDot" title="Autosaved locally"></span>
+      </div>
+    </div>
+    <textarea id="input" spellcheck="false" placeholder="Paste responses from ChatGPT, Claude, Gemini, DeepSeek, or any formula-heavy notes here..."></textarea>
+    <div class="hint">
+      <span>Auto-formats LaTeX, cases, raw tables, and symbols.</span>
+      <div class="stats" id="stats">
+        <span id="wordCount">0 words</span>
+        <span id="charCount">0 chars</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="pane">
+    <div class="pane-title">
+      <span>Rendered Preview</span>
+      <div class="pane-title-right">
+        <span class="status-dot" id="mathStatusDot" title="Preview ready"></span>
+      </div>
+    </div>
+    <div class="preview-shell" id="previewShell">
+      <article id="preview" class="preview"></article>
+    </div>
+    <div class="hint">
+      <span>Clean MathJax & GFM preview. Supports printing, PDF, and HTML export.</span>
+      <span id="readTime">~1 min read</span>
+    </div>
+  </section>
+</main>
+
+<button class="show-editor" id="showEditorButton" onclick="showEditor()" title="Show editor" aria-label="Show editor">›</button>
+<div class="copied" id="copied">Copied</div>
+
+<script>
+const input = document.getElementById("input");
+const preview = document.getElementById("preview");
+const previewShell = document.getElementById("previewShell");
+const mathStatusDot = document.getElementById("mathStatusDot");
+const saveDot = document.getElementById("saveDot");
+const wordCountEl = document.getElementById("wordCount");
+const charCountEl = document.getElementById("charCount");
+const readTimeEl = document.getElementById("readTime");
+
+marked.setOptions({ gfm: true, breaks: false, mangle: false, headerIds: false });
+
+// Comprehensive Math / LaTeX vocabulary for AI responses
+const CMDS = [
+  "\\theta","\\alpha","\\beta","\\gamma","\\lambda","\\rho","\\phi","\\varphi","\\psi","\\Omega","\\omega","\\zeta","\\eta","\\xi","\\chi",
+  "\\sum","\\frac","\\dfrac","\\binom","\\partial","\\nabla","\\operatorname","\\rightarrow","\\leftarrow","\\Rightarrow","\\Longrightarrow","\\leftrightarrow","\\xrightarrow","\\to",
+  "\\max","\\min","\\sup","\\lim","\\limsup","\\arg","\\in","\\notin","\\subset","\\subseteq","\\cup","\\cap","\\bigcup","\\bigcap","\\cdot","\\times",
+  "\\sigma","\\mu","\\delta","\\Theta","\\Delta","\\Gamma","\\Lambda","\\Sigma","\\Phi","\\Psi","\\odot","\\otimes","\\oplus","\\infty",
+  "\\leq","\\geq","\\neq","\\ne","\\sim","\\approx","\\equiv","\\propto","\\pm","\\prod","\\sqrt","\\text","\\mathbf","\\mathbb","\\mathcal","\\mathrm","\\mathfrak","\\mathsf",
+  "\\begin","\\end","\\pi","\\tau","\\epsilon","\\varepsilon","\\quad","\\qquad","\\dots","\\ldots","\\cdots","\\ddots","\\vdots","\\left","\\right",
+  "\\boxed","\\sin","\\cos","\\tan","\\cot","\\log","\\ln","\\exp","\\arctan","\\sinh","\\cosh","\\tanh","\\int","\\iint","\\oint",
+  "\\lVert","\\rVert","\\langle","\\rangle","\\hbar","\\dagger","\\hat","\\tilde","\\vec","\\bar"
+];
+
+const PRESETS = {
+  dl: `# Transformer Attention & Neural Network Foundations
+
+Neural network representations and modern large language model foundations.
+
+1. Multi-Head Scaled Dot-Product Attention
+Given query matrix $Q$, key matrix $K$, and value matrix $V$ with dimension $d_k$:
+
+\\operatorname{Attention}(Q, K, V) = \\operatorname{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right) V
+
+Where the Multi-Head Attention layer combines $h$ parallel attention projections:
+
+\\operatorname{MultiHead}(Q, K, V) = \\operatorname{Concat}(\\text{head}_1, \\dots, \\text{head}_h) W^O
+\\text{head}_i = \\operatorname{Attention}(Q W_i^Q, K W_i^K, V W_i^V)
+
+2. Cross-Entropy Loss & Regularization
+For multi-class classification over $K$ classes:
+
+L(\\theta) = -\\frac{1}{N} \\sum_{i=1}^N \\sum_{k=1}^K y_{ik} \\log(\\hat{y}_{ik}) + \\frac{\\lambda}{2} \\|\\theta\\|^2
+
+Where predicted probability $\\hat{y}_{ik}$ is computed using softmax:
+
+\\hat{y}_{ik} = \\frac{e^{z_{ik}}}{\\sum_{j=1}^K e^{z_{ij}}}
+
+3. AI Model Evaluation Benchmark
+Model          MMLU    GSM8K   HumanEval   Latency   Cost
+GPT-4o         88.7%   95.8%   90.2%       120ms     $5.00
+Claude-3.5     88.3%   96.4%   92.0%       115ms     $3.00
+Gemini-1.5     85.9%   91.2%   84.1%       130ms     $3.50
+
+4. PyTorch Implementation
+\`\`\`python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class ScaledDotProductAttention(nn.Module):
+    def __init__(self, d_k: int):
+        super().__init__()
+        self.scale = 1.0 / (d_k ** 0.5)
+
+    def forward(self, q, k, v, mask=None):
+        scores = torch.matmul(q, k.transpose(-2, -1)) * self.scale
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, -1e9)
+        weights = F.softmax(scores, dim=-1)
+        return torch.matmul(weights, v), weights
+\`\`\`
+`,
+
+  quantum: `# Quantum Mechanics & Linear Algebra Foundations
+
+1. The Time-Dependent Schrödinger Equation
+Describing the wave function $\\Psi(x, t)$ of a quantum mechanical system:
+
+i\\hbar \\frac{\\partial}{\\partial t} |\\Psi(t)\\rangle = \\hat{H} |\\Psi(t)\\rangle
+
+2. Quantum State Superposition & Pauli Matrices
+A qubit state is represented as:
+
+|\\psi\\rangle = \\alpha |0\\rangle + \\beta |1\\rangle, \\quad |\\alpha|^2 + |\\beta|^2 = 1
+
+The Pauli spin matrices in the computational basis:
+
+\\sigma_x = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}, \\quad \\sigma_y = \\begin{pmatrix} 0 & -i \\\\ i & 0 \\end{pmatrix}, \\quad \\sigma_z = \\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}
+
+3. Cauchy-Schwarz Inequality
+For arbitrary inner product space vectors:
+
+|\\langle u, v \\rangle|^2 \\leq \\|u\\|^2 \\cdot \\|v\\|^2
+`,
+
+  calculus: `# Mathematical Analysis & Piecewise Functions
+
+1. Piecewise Function Definition
+Consider the activation function:
+
+f(x) =
+\\begin{cases}
+x & \\text{if } x > 0 \\\\
+\\alpha (e^x - 1) & \\text{if } x \\leq 0
+\\end{cases}
+
+2. Taylor Series Expansion
+The Taylor series of infinitely differentiable function $f(x)$ at point $a$:
+
+f(x) = \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!} (x - a)^n = f(a) + f'(a)(x-a) + \\frac{f''(a)}{2!}(x-a)^2 + \\dots
+
+3. Normal Gaussian Distribution
+The probability density function:
+
+p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x - \\mu)^2}{2\\sigma^2}\\right)
+`
+};
+
+function escapeHtml(value) {
+  return value.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function normalizeTex(tex) {
+  return tex
+    .replace(/\u00a0/g, " ")
+    .replace(/\\(mathcal|mathbb|mathbf|mathrm|mathfrak|mathsf|mathtt)\s+([A-Za-z0-9])/g, "\\$1{$2}")
+    .replace(/\\(mathcal|mathbb|mathbf|mathrm|mathfrak|mathsf|mathtt)([A-Za-z0-9])/g, "\\$1{$2}")
+    .replace(/\\operatorname\s+([A-Za-z]+)/g, "\\operatorname{$1}")
+    .replace(/\\(left|right)\s+/g, "\\$1")
+    .trim();
+}
+
+// Protect math chunks while avoiding false positives on currency ($10, $5)
+function protectMathChunk(chunk, tokens) {
+  const code = [];
+  chunk = chunk.replace(/(`+)([\s\S]*?)\1/g, function(match) {
+    const token = "CLARITYCODETOKEN" + code.length + "END";
+    code.push({ token, value: match });
+    return token;
+  });
+
+  function holdMath(tex, display) {
+    const token = "CLARITYMATHTOKEN" + tokens.length + "END";
+    tokens.push({ token, tex: normalizeTex(tex), display });
+    return token;
+  }
+
+  // Display math blocks
+  chunk = chunk.replace(/\\\[([\s\S]*?)\\\]/g, (_, tex) => holdMath(tex, true));
+  chunk = chunk.replace(/\$\$([\s\S]*?)\$\$/g, (_, tex) => holdMath(tex, true));
+
+  // LaTeX inline math \( ... \)
+  chunk = chunk.replace(/\\\(([^\n]*?)\\\)/g, (_, tex) => holdMath(tex, false));
+
+  // Safe inline math $...$
+  // Requires: opening $ not followed by space, closing $ not preceded by space.
+  // Must NOT match isolated currency values like "$10 and $20".
+  chunk = chunk.replace(/(^|[^\\])\$(?!\s)([^$\n]*?\S)\$(?!\d)/g, function(match, prefix, tex) {
+    // If it is just a pure price or currency number (e.g., "10", "15.50", "100"), preserve as currency
+    if (/^\d+(?:[.,]\d{1,2})?$/.test(tex.trim())) {
+      return match;
+    }
+    // If it has multiple words with no math symbols at all, treat as currency sentence
+    if (!/[\\_=^<>{}+*\/[\]()|\-]/.test(tex) && (tex.match(/[a-zA-Z]{2,}/g) || []).length >= 2) {
+      return match;
+    }
+    return prefix + holdMath(tex, false);
+  });
+
+  code.forEach(item => {
+    chunk = chunk.replaceAll(item.token, item.value);
+  });
+  return chunk;
+}
+
+function protectMathFragments(text) {
+  const tokens = [];
+  const out = [];
+  let prose = [];
+  let fenceChar = "";
+  let fenceLength = 0;
+
+  function flush() {
+    if (!prose.length) return;
+    out.push(protectMathChunk(prose.join("\n"), tokens));
+    prose = [];
+  }
+
+  norm(text).split("\n").forEach(function(line) {
+    const mark = line.match(/^ {0,3}(`{3,}|~{3,})/);
+    if (!fenceChar && mark) {
+      flush();
+      fenceChar = mark[1][0];
+      fenceLength = mark[1].length;
+      out.push(line);
+      return;
+    }
+    if (fenceChar) {
+      out.push(line);
+      const close = line.match(/^ {0,3}(`{3,}|~{3,})\s*$/);
+      if (close && close[1][0] === fenceChar && close[1].length >= fenceLength) {
+        fenceChar = "";
+        fenceLength = 0;
+      }
+      return;
+    }
+    prose.push(line);
+  });
+  flush();
+  return { text: out.join("\n"), tokens };
+}
+
+function restoreMathMarkdown(markdown, tokens) {
+  tokens.forEach(function(item) {
+    const value = item.display ? "\n\n$$\n" + item.tex + "\n$$\n\n" : "$" + item.tex + "$";
+    markdown = markdown.replaceAll(item.token, value);
+  });
+  return markdown;
+}
+
+function restoreMathHtml(html, tokens) {
+  const alignEl = document.getElementById("mathAlign");
+  const centered = alignEl && alignEl.value === "center";
+  tokens.filter(item => item.display).forEach(function(item) {
+    const cls = centered ? "math-display center" : "math-display";
+    const value = '<div class="' + cls + '">\\[' + escapeHtml(item.tex) + '\\]</div>';
+    html = html.replaceAll("<p>" + item.token + "</p>", value);
+    html = html.replaceAll(item.token, value);
+  });
+  tokens.filter(item => !item.display).forEach(function(item) {
+    const value = '<span class="math-inline">\\(' + escapeHtml(item.tex) + '\\)</span>';
+    html = html.replaceAll(item.token, value);
+  });
+  return html;
+}
+
+function norm(t) {
+  return t.replace(/\u2028|\u2029/g, "\n").replace(/\r\n?/g, "\n").replace(/[ \t]+$/gm, "").replace(/“|”/g, '"');
+}
+
+function sep(l) {
+  return /^[-⸻—–]{3,}$/.test(l.trim()) || l.trim() === "⸻";
+}
+
+// Improved existing detection: markdown table rows must have pipes separating columns, not norms like ||x||
+function existing(l) {
+  let t = l.trim();
+  if (/^#{1,6}\s/.test(t) || /^```/.test(t) || /^\$\$/.test(t) || /^\\\[/.test(t) || /^<div class=/.test(t)) {
+    return true;
+  }
+  // True markdown table rows: start with single pipe (not double ||), have at least one internal pipe cell
+  if (/^\|(?=[^|])(?:[^|]+\|){1,}/.test(t) && !/^\|\|/.test(t) && !/[=+\-*\/^<>]/.test(t.replace(/\|/g, ""))) {
+    return true;
+  }
+  return false;
+}
+
+function list(l) {
+  let t = l.trim();
+  if (/^[-*+]\s+/.test(t)) return true;
+  if (/^\d+\.\s+/.test(t)) {
+    if (heading(t)) return false;
+    return true;
+  }
+  return false;
+}
+
+function heading(l) {
+  let t = l.trim();
+  if (!t || existing(t)) return false;
+  if (t.length > 110) return false;
+  if (/^INFO\s*\d*/i.test(t)) return "h1";
+  if (/^\d+\.\d+(\.\d+)?\s+\S/.test(t)) return "h3";
+  if (/^\d+\.\s+\S/.test(t)) {
+    let body = t.replace(/^\d+\.\s+/, "").trim();
+    if (body.length <= 85 && !/[.!?]$/.test(body)) return "h2";
+  }
+  return false;
+}
+
+function hasCmd(t) {
+  return CMDS.some(c => t.includes(c));
+}
+
+function words(t) {
+  return (t.replace(/\\[a-zA-Z]+/g, "").match(/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/g) || []);
+}
+
+function hasNaturalText(t) {
+  return words(t).length >= 2;
+}
+
+function startsMath(t) {
+  return /^(\\[A-Za-z]+|[A-Za-z](_|\^|\(|\{|=)|[-+]?\d|[()[\]{}|])/.test(t.trim());
+}
+
+function tiny(t) {
+  return /^[A-Za-z][A-Za-z0-9_']*(\([^)]*\))?$/.test(t) ||
+         /^[A-Za-z]_\{?[^}\s]+\}?(\^\{?[^}\s]+\}?)?$/.test(t) ||
+         /^[-+]?\d+(\.\d+)?$/.test(t) ||
+         /^[+\-=\[\]\(\)]$/.test(t) ||
+         /^\\(leftarrow|rightarrow|Rightarrow|quad|cdot|odot)$/.test(t);
+}
+
+function labelOnly(t) {
+  return /^(Here|Example|Examples|Because|If|Then|Result|Update|Gradient|Formula|Derivative|Wrong|Correct|Short|Exam|Translation|Advantage|Disadvantage|Logic|Target|Total|Average|Errors|Products|Prompt|Structure|Colors|Typography|Accents|Decorations|Note|Warning|Definition):?$/i.test(t);
+}
+
+function formula(l) {
+  let t = l.trim();
+  if (!t || /^CLARITY(?:MATH|CODE)TOKEN\d+END$/.test(t) || sep(t) || existing(t) || list(t) || heading(t) || labelOnly(t)) return false;
+  if (t.length > 250 && !hasCmd(t)) return false;
+  if (hasNaturalText(t) && !startsMath(t)) return false;
+  if (hasCmd(t)) {
+    if (hasNaturalText(t) && /^[A-Za-zÇĞİÖŞÜçğıöşü]/.test(t)) return false;
+    return true;
+  }
+  if (tiny(t)) return true;
+  let c = t.replace(/\s+/g, "");
+  // Recognize equations with comparison/math operators (including norms ||x||, <=, >=, etc.)
+  if (/[=+\-*/^_{}()[\]|<>]/.test(c) && c.length <= 160 && /^[A-Za-z0-9_{}()[\]|.,;:'+\-*/^=<>€\\%]+$/.test(c)) {
+    if (hasNaturalText(t)) return false;
+    return true;
+  }
+  return false;
+}
+
+function protect(s) {
+  return normalizeTex(
+    s.replace(/→/g, "\\rightarrow ")
+     .replace(/←/g, "\\leftarrow ")
+     .replace(/⇒/g, "\\Rightarrow ")
+     .replace(/⇔/g, "\\Leftrightarrow ")
+     .replace(/≥/g, "\\geq ")
+     .replace(/≤/g, "\\leq ")
+     .replace(/≠/g, "\\neq ")
+     .replace(/≈/g, "\\approx ")
+     .replace(/∞/g, "\\infty ")
+     .replace(/…/g, "\\dots ")
+     .replace(/×/g, "\\times ")
+     .replace(/·/g, "\\cdot ")
+     .replace(/±/g, "\\pm ")
+  );
+}
+
+// Clean math groups with balanced norms and standard operators
+function cleanGroup(lines) {
+  let j = lines.map(x => x.trim()).join(" ");
+  j = protect(j).replace(/\s+/g, " ")
+    .replace(/\s+([,.;:)\]])/g, "$1")
+    .replace(/([(\[])\s+/g, "$1")
+    .replace(/\s*<=\s*/g, " \\leq ")
+    .replace(/\s*>=\s*/g, " \\geq ")
+    .replace(/\s*!=\s*/g, " \\neq ")
+    .replace(/\s*:=\s*/g, " := ")
+    .replace(/\s*\\leftarrow\s*/g, " \\leftarrow ")
+    .replace(/\s*\\rightarrow\s*/g, " \\rightarrow ")
+    .replace(/\s*\\Rightarrow\s*/g, " \\Rightarrow ")
+    .replace(/\s*\\odot\s*/g, " \\odot ")
+    .replace(/\s*\\cdot\s*/g, " \\cdot ");
+
+  // Balance norms ||x|| -> \lVert x \rVert
+  j = j.replace(/\|\|([^|]+?)\|\|/g, "\\lVert $1 \\rVert");
+  // If any unclosed || remains:
+  j = j.replace(/\|\|/g, "\\Vert ");
+
+  return j.trim();
+}
+
+function mathBlock(f) {
+  const alignEl = document.getElementById("mathAlign");
+  const cls = (alignEl && alignEl.value === "center") ? "math-display center" : "math-display";
+  return `<div class="${cls}">$$\n${f}\n$$</div>`;
+}
+
+// Split table rows: supports any number of columns (2 or more)
+function splitTableRow(line) {
+  let t = line.trim();
+  if (!t) return null;
+  if (formula(t) || heading(t) || sep(t) || existing(t) || /^```/.test(t)) return null;
+
+  if (t.includes("\t")) {
+    let cells = t.split(/\t+/).map(c => c.trim()).filter(Boolean);
+    return cells.length >= 2 ? cells : null;
+  }
+
+  let cells = t.split(/\s{2,}/).map(c => c.trim()).filter(Boolean);
+  if (cells.length >= 2) return cells;
+  return null;
+}
+
+function tabTable(block) {
+  let rows = block.map(splitTableRow).filter(Boolean);
+  if (rows.length < 2) return block.join("\n");
+  let n = rows[0].length;
+  if (n < 2) return block.join("\n");
+  if (!rows.every(r => r.length === n)) return block.join("\n");
+  return [
+    "| " + rows[0].join(" | ") + " |",
+    "| " + Array(n).fill("---").join(" | ") + " |",
+    ...rows.slice(1).map(r => "| " + r.join(" | ") + " |")
+  ].join("\n");
+}
+
+function tables(lines) {
+  let out = [], i = 0;
+  while (i < lines.length) {
+    let row = splitTableRow(lines[i]);
+    if (row) {
+      let b = [], j = i;
+      while (j < lines.length && splitTableRow(lines[j])) {
+        b.push(lines[j]);
+        j++;
+      }
+      if (b.length >= 2) {
+        out.push(tabTable(b));
+        i = j;
+        continue;
+      }
+    }
+    out.push(lines[i++]);
+  }
+  return out;
+}
+
+function heads(lines) {
+  return lines.map(l => {
+    let t = l.trim();
+    if (existing(t) || sep(t)) return l;
+    let h = heading(t);
+    if (h === "h1") return "# " + t;
+    if (h === "h2") return "## " + t;
+    if (h === "h3") return "### " + t;
+    return l;
+  });
+}
+
+function inlineMath(line) {
+  if (!line.trim() || existing(line) || sep(line) || formula(line)) return line;
+
+  let prefix = "";
+  let s = line;
+  let m = s.match(/^(\s*[-*+]\s+|\s*\d+\.\s+)/);
+  if (m) {
+    prefix = m[1];
+    s = s.slice(prefix.length);
+  }
+
+  const holders = [];
+  function hold(x) {
+    const key = "@@MATH" + holders.length + "@@";
+    holders.push("$" + x.trim() + "$");
+    return key;
+  }
+  function holdLiteral(x) {
+    const key = "@@MATH" + holders.length + "@@";
+    holders.push(x);
+    return key;
+  }
+
+  // Preserve code backticks strictly as markdown
+  s = s.replace(/(`+)([^\n]*?)\1/g, function(x) {
+    return holdLiteral(x);
+  });
+  s = s.replace(/!?\[[^\]\n]*\]\([^\s)]+(?:\s+"[^"]*")?\)/g, function(x) {
+    return holdLiteral(x);
+  });
+  s = s.replace(/https?:\/\/[^\s<]+/g, function(x) {
+    return holdLiteral(x);
+  });
+
+  function isMathyChunk(x) {
+    if (!x || !x.trim()) return false;
+    const t = x.trim();
+    if (!/[\\_^=<>+\-*\/]|\\frac|\\sqrt|\\sum|\\max|\\min|\\sigma|\\theta|\\lambda|\\gamma|\\delta|\\epsilon/.test(t)) return false;
+    const w = (t.replace(/\\text\{[^}]*\}/g, "").replace(/\\[A-Za-z]+/g, "").match(/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/g) || []);
+    return w.length <= 2;
+  }
+
+  s = s.replace(/^([^:\n]{1,40}:\s*)(.+)$/, function(match, label, rest) {
+    if (isMathyChunk(rest)) return label + hold(rest);
+    return match;
+  });
+
+  s = s.replace(/^([^:\n]*\\[^:\n]*|[^:\n]*[_^][^:\n]*):/, function(match, a) {
+    if (/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}\s+[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/.test(a) && !hasCmd(a)) return match;
+    return hold(a) + ":";
+  });
+
+  const bigMath = /(?:\\[A-Za-z]+(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})*|[A-Za-z][A-Za-z0-9]*)(?:\([^)]*\))?(?:_\{[^}]+\}|_[A-Za-z0-9]+|\^\{[^}]+\}|\^[A-Za-z0-9]+)*(?:\s*(?:=|:=|<|>|\\leq|\\geq|\\neq)\s*(?:\\[A-Za-z]+(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})*|[A-Za-z0-9_{}()^'.+\-*\/\\%]+))+/g;
+  s = s.replace(bigMath, function(x) {
+    if (x.includes("@@MATH")) return x;
+    if (!isMathyChunk(x)) return x;
+    return hold(x);
+  });
+
+  s = s.replace(/\\(?:frac|sqrt)\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g, function(x) {
+    if (x.includes("@@MATH")) return x;
+    return hold(x);
+  });
+
+  const tokenPatterns = [
+    /\\(?:theta|alpha|beta|gamma|lambda|sigma|mu|delta|Theta|Delta|pi|tau|epsilon|omega|phi|psi)(?:_\{[^}]+\}|_[A-Za-z0-9]+)?(?:\^\{[^}]+\}|\^[A-Za-z0-9]+)?/g,
+    /\b[A-Za-z][A-Za-z0-9]*(?:_\{[^}]+\}|_[A-Za-z0-9]+)(?:\^\{[^}]+\}|\^[A-Za-z0-9]+)?/g,
+    /\b[A-Za-z][A-Za-z0-9]*(?:\^\{[^}]+\}|\^[A-Za-z0-9]+)(?:_\{[^}]+\}|_[A-Za-z0-9]+)?/g
+  ];
+
+  tokenPatterns.forEach(function(re) {
+    s = s.replace(re, function(x) {
+      if (x.includes("@@MATH")) return x;
+      return hold(x);
+    });
+  });
+
+  holders.forEach((v, i) => {
+    s = s.replaceAll("@@MATH" + i + "@@", v);
+  });
+  return prefix + s;
+}
+
+function isCasesBegin(t) { return /\\begin\{cases\}/.test(t); }
+function isCasesEnd(t) { return /\\end\{cases\}/.test(t); }
+
+function cleanCasesGroup(lines) {
+  let raw = lines.map(x => x.trim()).filter(Boolean);
+  let prefix = "";
+  let rows = [];
+  let inside = false;
+
+  for (let line of raw) {
+    line = protect(line);
+    if (line.includes("\\begin{cases}")) {
+      inside = true;
+      let before = line.split("\\begin{cases}")[0].trim();
+      if (before) prefix = before;
+      let after = line.split("\\begin{cases}").slice(1).join("\\begin{cases}").trim();
+      if (after && !after.includes("\\end{cases}")) rows.push(after);
+      continue;
+    }
+    if (line.includes("\\end{cases}")) {
+      let before = line.split("\\end{cases}")[0].trim();
+      if (before) rows.push(before);
+      inside = false;
+      continue;
+    }
+    if (inside) {
+      rows.push(line);
+    } else if (!prefix && line) {
+      prefix = line;
+    }
+  }
+
+  rows = rows
+    .map(r => r.replace(/\\\\\s*$/, "").trim())
+    .filter(Boolean)
+    .map(r => r.replace(/\s*&\s*/g, " & "));
+
+  if (rows.length === 0) {
+    return raw.join(" ").replace(/\\begin\{cases\}/g, "\\begin{array}{ll}").replace(/\\end\{cases\}/g, "\\end{array}");
+  }
+
+  let body = rows.join(" \\\\ ");
+  if (prefix && !/[=]$/.test(prefix.trim())) prefix = prefix + " ";
+  return (prefix ? prefix + " " : "") + "\\left\\{\\begin{array}{ll} " + body + " \\end{array}\\right.";
+}
+
+function maths(lines) {
+  let out = [], i = 0, inCode = false, inManual = false;
+  while (i < lines.length) {
+    let l = lines[i], t = l.trim();
+    if (/^```/.test(t)) { inCode = !inCode; out.push(l); i++; continue; }
+    if (/^\$\$/.test(t) || /^\\\[/.test(t)) { inManual = !inManual; out.push(l); i++; continue; }
+    if (!inCode && !inManual && sep(t)) { out.push("\n---\n"); i++; continue; }
+
+    if (!inCode && !inManual && !list(t) && !heading(t) && (isCasesBegin(t) || (formula(l) && i + 1 < lines.length && isCasesBegin(lines[i + 1].trim())))) {
+      let g = [], j = i, found = false;
+      while (j < lines.length && j - i < 30) {
+        g.push(lines[j]);
+        if (isCasesEnd(lines[j].trim())) { found = true; j++; break; }
+        j++;
+      }
+      if (found) {
+        i = j;
+        out.push("\n" + mathBlock(cleanCasesGroup(g)) + "\n");
+        continue;
+      }
+    }
+
+    if (!inCode && !inManual && formula(l)) {
+      let g = [];
+      while (i < lines.length && formula(lines[i]) && !isCasesBegin(lines[i].trim())) {
+        g.push(lines[i++]);
+      }
+      out.push("\n" + mathBlock(cleanGroup(g)) + "\n");
+      continue;
+    }
+
+    out.push(!inCode && !inManual ? inlineMath(l) : l);
+    i++;
+  }
+  return out;
+}
+
+function preprocessCore(text) {
+  let lines = norm(text).split("\n");
+  lines = tables(lines);
+  lines = heads(lines);
+  lines = maths(lines);
+  return lines.join("\n").replace(/\n{4,}/g, "\n\n\n");
+}
+
+function prepareDocument(text) {
+  const protectedDoc = protectMathFragments(text);
+  return {
+    markdown: preprocessCore(protectedDoc.text),
+    tokens: protectedDoc.tokens
+  };
+}
+
+function preprocess(text) {
+  const doc = prepareDocument(text);
+  return restoreMathMarkdown(doc.markdown, doc.tokens);
+}
+
+function updateStats(text) {
+  const chars = text.length;
+  const words = (text.trim().match(/\S+/g) || []).length;
+  if (wordCountEl) wordCountEl.textContent = `${words} word${words === 1 ? '' : 's'}`;
+  if (charCountEl) charCountEl.textContent = `${chars.toLocaleString()} chars`;
+  const minutes = Math.max(1, Math.ceil(words / 200));
+  if (readTimeEl) readTimeEl.textContent = `~${minutes} min read`;
+}
+
+function enhancePreview() {
+  preview.querySelectorAll("table").forEach(function(table) {
+    if (table.parentElement && table.parentElement.classList.contains("table-scroll")) return;
+    const wrapper = document.createElement("div");
+    wrapper.className = "table-scroll";
+    table.classList.add("preview-table");
+    table.parentNode.insertBefore(wrapper, table);
+    wrapper.appendChild(table);
+  });
+
+  preview.querySelectorAll("a[href]").forEach(function(link) {
+    if (/^https?:/i.test(link.getAttribute("href") || "")) {
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+    }
+  });
+
+  // Enhance code blocks with copy button & header
+  preview.querySelectorAll("pre").forEach(function(pre) {
+    if (pre.parentElement && pre.parentElement.classList.contains("code-block-wrapper")) return;
+    const codeEl = pre.querySelector("code");
+    const langMatch = (codeEl ? codeEl.className : "").match(/language-([a-z0-9_-]+)/i);
+    const langName = langMatch ? langMatch[1] : "code";
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "code-block-wrapper";
+
+    const header = document.createElement("div");
+    header.className = "code-header";
+
+    const title = document.createElement("span");
+    title.textContent = langName;
+
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "code-copy-btn";
+    copyBtn.textContent = "Copy";
+    copyBtn.onclick = function() {
+      const codeText = codeEl ? codeEl.innerText : pre.innerText;
+      copyToClipboard(codeText);
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => { copyBtn.textContent = "Copy"; }, 1500);
+    };
+
+    header.appendChild(title);
+    header.appendChild(copyBtn);
+
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(header);
+    wrapper.appendChild(pre);
+  });
+}
+
+let renderSequence = 0;
+
+async function renderPreview() {
+  const sequence = ++renderSequence;
+  const content = input.value;
+  localStorage.setItem("clarityPadText", content);
+  updateStats(content);
+
+  const doc = prepareDocument(content);
+  let raw = marked.parse(doc.markdown);
+  raw = restoreMathHtml(raw, doc.tokens);
+
+  if (window.MathJax && window.MathJax.typesetClear) {
+    window.MathJax.typesetClear([preview]);
+  }
+
+  preview.innerHTML = DOMPurify.sanitize(raw, {
+    ADD_ATTR: ["class", "target", "rel"]
+  });
+
+  enhancePreview();
+
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    try {
+      await window.MathJax.typesetPromise([preview]);
+      if (sequence !== renderSequence) return;
+      const errors = preview.querySelectorAll("mjx-merror");
+      if (errors.length > 0) {
+        mathStatusDot.classList.add("error");
+        mathStatusDot.title = `${errors.length} formula syntax error${errors.length > 1 ? 's' : ''}`;
+      } else {
+        mathStatusDot.classList.remove("error");
+        mathStatusDot.title = "Formulas rendered perfectly";
+      }
+    } catch (e) {
+      console.error("MathJax typeset error:", e);
+      mathStatusDot.classList.add("error");
+    }
+  }
+}
+
+function toast(msg) {
+  const el = document.getElementById("copied");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 1500);
+}
+
+async function copyToClipboard(text) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (err) {
+    console.warn("Clipboard API failed, trying fallback:", err);
+  }
+  // Fallback
+  const temp = document.createElement("textarea");
+  temp.value = text;
+  temp.style.position = "fixed";
+  temp.style.opacity = "0";
+  document.body.appendChild(temp);
+  temp.focus();
+  temp.select();
+  document.execCommand("copy");
+  document.body.removeChild(temp);
+  return true;
+}
+
+function closeMoreMenu() {
+  const menu = document.getElementById("moreMenu");
+  const btn = document.getElementById("moreButton");
+  if (menu) menu.classList.remove("open");
+  if (btn) btn.setAttribute("aria-expanded", "false");
+}
+
+function toggleMoreMenu(event) {
+  event.stopPropagation();
+  const menu = document.getElementById("moreMenu");
+  const btn = document.getElementById("moreButton");
+  const open = !menu.classList.contains("open");
+  menu.classList.toggle("open", open);
+  btn.setAttribute("aria-expanded", String(open));
+}
+
+document.addEventListener("click", closeMoreMenu);
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeMoreMenu(); });
+const moreMenuEl = document.getElementById("moreMenu");
+if (moreMenuEl) moreMenuEl.addEventListener("click", e => e.stopPropagation());
+
+async function copyCleanMarkdown() {
+  const clean = preprocess(input.value)
+    .replace(/<div class="math-display center">|<div class="math-display">|<\/div>/g, "")
+    .trim();
+  await copyToClipboard(clean);
+  closeMoreMenu();
+  toast("Clean Markdown copied");
+}
+
+async function copyPreviewHtml() {
+  await copyToClipboard(preview.innerHTML);
+  closeMoreMenu();
+  toast("Preview HTML copied");
+}
+
+function downloadMarkdown() {
+  const clean = preprocess(input.value)
+    .replace(/<div class="math-display center">|<div class="math-display">|<\/div>/g, "")
+    .trim();
+  const blob = new Blob([clean], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "claritypad-note.md";
+  a.click();
+  URL.revokeObjectURL(url);
+  closeMoreMenu();
+  toast("Markdown downloaded");
+}
+
+function downloadHtml() {
+  const css = document.querySelector("style").innerHTML;
+  const isDark = document.body.classList.contains("dark");
+  const content = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClarityPad Export</title>
+  <style>
+    ${css}
+    body { padding: 40px 20px; }
+  </style>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\\\(','\\\\)'],['$','$']], displayMath: [['\\\\[','\\\\]'],['$$','$$']], processEscapes: true, packages: {'[+]': ['ams']} },
+      svg: { fontCache: 'global' }
+    };
+  <\/script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg-full.js"><\/script>
+</head>
+<body class="${isDark ? 'dark' : ''}">
+  <main class="preview">
+    ${preview.innerHTML}
+  </main>
+</body>
+</html>`;
+
+  const blob = new Blob([content], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "claritypad-export.html";
+  a.click();
+  URL.revokeObjectURL(url);
+  closeMoreMenu();
+  toast("HTML export downloaded");
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("clarityPadTheme", document.body.classList.contains("dark") ? "dark" : "light");
+  closeMoreMenu();
+}
+
+function hideEditor() {
+  document.getElementById("wrap").classList.add("reading-only");
+}
+
+function showEditor() {
+  document.getElementById("wrap").classList.remove("reading-only");
+  input.focus();
+}
+
+function toggleReaderMode() {
+  const wrap = document.getElementById("wrap");
+  if (wrap.classList.contains("reading-only")) {
+    showEditor();
+  } else {
+    hideEditor();
+  }
+  closeMoreMenu();
+}
+
+function toggleDensity() {
+  const isCompact = document.getElementById("densityMode").value === "compact";
+  document.getElementById("wrap").classList.toggle("compact", isCompact);
+}
+
+function cycleDensity() {
+  const select = document.getElementById("densityMode");
+  select.value = select.value === "compact" ? "normal" : "compact";
+  toggleDensity();
+  closeMoreMenu();
+}
+
+function cycleMathAlign() {
+  const select = document.getElementById("mathAlign");
+  select.value = select.value === "center" ? "left" : "center";
+  renderPreview();
+  closeMoreMenu();
+}
+
+function loadPresetSample(presetKey) {
+  if (presetKey === "clear") {
+    if (confirm("Are you sure you want to clear your current note?")) {
+      input.value = "";
+      renderPreview();
+    }
+  } else if (PRESETS[presetKey]) {
+    input.value = PRESETS[presetKey];
+    renderPreview();
+    toast("Preset loaded");
+  }
+  document.getElementById("sampleSelect").value = "";
+}
+
+// Synchronized scrolling with requestAnimationFrame
+let isSyncing = false;
+function syncScroll(source, target) {
+  const syncToggle = document.getElementById("syncScroll");
+  if (!syncToggle || !syncToggle.checked || isSyncing) return;
+  isSyncing = true;
+  window.requestAnimationFrame(() => {
+    const maxS = source.scrollHeight - source.clientHeight;
+    const maxT = target.scrollHeight - target.clientHeight;
+    if (maxS > 0) {
+      target.scrollTop = (source.scrollTop / maxS) * maxT;
+    }
+    isSyncing = false;
+  });
+}
+
+// Keyboard shortcuts & Tab key handling in textarea
+input.addEventListener("keydown", function(e) {
+  // Tab key indentation
+  if (e.key === "Tab") {
+    e.preventDefault();
+    const start = this.selectionStart;
+    const end = this.selectionEnd;
+    const val = this.value;
+
+    if (e.shiftKey) {
+      // Unindent
+      const lineStart = val.lastIndexOf("\n", start - 1) + 1;
+      if (val.slice(lineStart, lineStart + 2) === "  ") {
+        this.value = val.slice(0, lineStart) + val.slice(lineStart + 2);
+        this.selectionStart = Math.max(lineStart, start - 2);
+        this.selectionEnd = Math.max(lineStart, end - 2);
+      }
+    } else {
+      // Indent 2 spaces
+      this.value = val.substring(0, start) + "  " + val.substring(end);
+      this.selectionStart = this.selectionEnd = start + 2;
+    }
+    renderPreview();
+    return;
+  }
+
+  // Ctrl/Cmd shortcuts
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === "s" || e.key === "S") {
+      e.preventDefault();
+      localStorage.setItem("clarityPadText", this.value);
+      toast("Note saved");
+      return;
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      renderPreview();
+      return;
+    }
+    if (e.key === "e" || e.key === "E") {
+      e.preventDefault();
+      toggleReaderMode();
+      return;
+    }
+    // Bold: Cmd+B
+    if (e.key === "b" || e.key === "B") {
+      e.preventDefault();
+      wrapSelection(this, "**", "**");
+      return;
+    }
+    // Italic: Cmd+I
+    if (e.key === "i" || e.key === "I") {
+      e.preventDefault();
+      wrapSelection(this, "*", "*");
+      return;
+    }
+    // Math: Cmd+M
+    if (e.key === "m" || e.key === "M") {
+      e.preventDefault();
+      wrapSelection(this, "$", "$");
+      return;
+    }
+  }
+});
+
+function wrapSelection(textarea, before, after) {
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const val = textarea.value;
+  const selected = val.substring(start, end);
+  textarea.value = val.substring(0, start) + before + selected + after + val.substring(end);
+  textarea.selectionStart = start + before.length;
+  textarea.selectionEnd = end + before.length;
+  renderPreview();
+}
+
+// System theme auto-detection
+const savedTheme = localStorage.getItem("clarityPadTheme");
+if (savedTheme === "dark" || (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  document.body.classList.add("dark");
+}
+
+input.addEventListener("scroll", () => syncScroll(input, previewShell));
+previewShell.addEventListener("scroll", () => syncScroll(previewShell, input));
+
+input.addEventListener("input", () => {
+  saveDot.classList.add("saving");
+  clearTimeout(window.__inputTimer);
+  window.__inputTimer = setTimeout(() => {
+    renderPreview();
+    saveDot.classList.remove("saving");
+  }, 250);
+});
+
+const mathScript = document.getElementById("mathjax-script");
+if (mathScript) {
+  mathScript.addEventListener("load", renderPreview);
+}
+
+// Initial state load: saved text, or load preset if empty
+const savedText = localStorage.getItem("clarityPadText");
+if (savedText && savedText.trim()) {
+  input.value = savedText;
+} else {
+  input.value = PRESETS.dl;
+}
+
+renderPreview();
+</script>
+</body>
+</html>
