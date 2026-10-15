@@ -349,6 +349,14 @@ function runAllTests(htmlFilePath) {
     html.includes("setTimeout(() => URL.revokeObjectURL(url), 1000)")
   );
 
+  // 13.9 Bold label with LaTeX math does not inject stray dollar signs into bold tags or formula
+  const boldMathInput = "> **İlk bitin ulaşması:** \\(d_{\\mathrm{prop}}\\)\n> **Mesajın tamamının ulaşması:** \\(d_{\\mathrm{trans}}+d_{\\mathrm{prop}}\\)";
+  const boldMathPre = sandbox.preprocess(boldMathInput);
+  test("Bold label with LaTeX math does not inject stray dollar signs into markdown or bold tags",
+    !boldMathPre.includes(":$**") && !boldMathPre.includes("prop}$$") && boldMathPre.includes("**İlk bitin ulaşması:** $d_{\\mathrm{prop}}$"),
+    `Result: ${boldMathPre}`
+  );
+
   console.log(`\n======================================================`);
   console.log(`TEST SUMMARY: TOTAL: ${passed + failed} | PASSED: ${passed} | FAILED: ${failed}`);
   console.log(`======================================================\n`);

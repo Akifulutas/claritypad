@@ -1438,8 +1438,8 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
 
       let prefix = "";
       let s = line;
-      let m = s.match(/^(\s*[-*+]\s+|\s*\d+\.\s+)/);
-      if (m) {
+      let m = s.match(/^(\s*(?:>+\s*)*(?:[-*+]\s+|\d+\.\s+)?)/);
+      if (m && m[1]) {
         prefix = m[1];
         s = s.slice(prefix.length);
       }
@@ -1456,26 +1456,30 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
         return key;
       }
 
+      // Protect existing math/code tokens from being mangled or re-wrapped by inline heuristics
+      s = s.replace(/CLARITY(?:MATH|CODE)TOKEN\d+END/g, x => holdLiteral(x));
       s = s.replace(/(`+)([^\n]*?)\1/g, x => holdLiteral(x));
       s = s.replace(/!?\[[^\]\n]*\]\([^\s)]+(?:\s+"[^"]*")?\)/g, x => holdLiteral(x));
       s = s.replace(/https?:\/\/[^\s<]+/g, x => holdLiteral(x));
 
       function isMathyChunk(x) {
-        if (!x || !x.trim()) return false;
+        if (!x || !x.trim() || x.includes("@@MATH") || /CLARITY(?:MATH|CODE)TOKEN/.test(x)) return false;
         const t = x.trim();
         if (!/[\\_^=<>+\-*\/]|\\frac|\\sqrt|\\sum|\\max|\\min|\\sigma|\\theta|\\lambda|\\gamma|\\delta|\\epsilon/.test(t)) return false;
         const w = (t.replace(/\\text\{[^}]*\}/g, "").replace(/\\[A-Za-z]+/g, "").match(/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/g) || []);
         return w.length <= 2;
       }
 
-      s = s.replace(/^([^:\n]{1,40}:\s*)(.+)$/, function(match, label, rest) {
+      // Match label with colon preserving markdown bold/italic asterisks (e.g. "**Label:** rest")
+      s = s.replace(/^(\*{0,2}[^:\n*]{1,50}(?::\*{0,2}|\*{0,2}:)\s+)(.+)$/, function(match, label, rest) {
         if (isMathyChunk(rest)) return label + hold(rest);
         return match;
       });
 
-      s = s.replace(/^([^:\n]*\\[^:\n]*|[^:\n]*[_^][^:\n]*):/, function(match, a) {
-        if (/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}\s+[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/.test(a) && !hasCmd(a)) return match;
-        return hold(a) + ":";
+      s = s.replace(/^(\*{0,2})([^:\n*]+)(\*{0,2}):/, function(match, b1, a, b2) {
+        if (/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}\s+[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/.test(a) && !/\\/.test(a)) return match;
+        if (!/[\\_^]/.test(a) || !isMathyChunk(a)) return match;
+        return b1 + hold(a) + b2 + ":";
       });
 
       const bigMath = /(?:\\[A-Za-z]+(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})*|[A-Za-z][A-Za-z0-9]*)(?:\([^)]*\))?(?:_\{[^}]+\}|_[A-Za-z0-9]+|\^\{[^}]+\}|\^[A-Za-z0-9]+)*(?:\s*(?:=|:=|<|>|\\leq|\\geq|\\neq)\s*(?:\\[A-Za-z]+(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})*|[A-Za-z0-9_{}()^'.+\-*\/\\%]+))+/g;
