@@ -1,7 +1,7 @@
 # ClarityPad 🖋️📐
 
 > **The Apple-grade Math & Markdown Notebook for AI Outputs (ChatGPT, Claude, Gemini, DeepSeek).**  
-> Built with 2026 Liquid Glass UI, Anti-AI Slop design principles, and an automated 38-assertion test suite. Instantly parses, repairs, and renders messy AI formulas, bare LaTeX commands, and mangled tables into publication-quality notes with live preview and one-click export.
+> Built with 2026 Liquid Glass UI, Anti-AI Slop design principles, and an automated 48-assertion test suite. Instantly parses, repairs, and renders messy AI formulas, bare LaTeX commands, and mangled tables into publication-quality notes with live preview and one-click export.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Design: Liquid Glass](https://img.shields.io/badge/Design-Liquid%20Glass%20UI-blueviolet.svg)](design.md)
@@ -26,7 +26,7 @@ When copying technical explanations, mathematical derivations, or benchmark tabl
 
 ## ✨ Key Features & 2026 Architectural Innovations
 
-- 💎 **Liquid Glass UI (Sıvı Cam)**:
+- 💎 **Liquid Glass UI**:
   - Ultra-thin material physics: `backdrop-filter: blur(28px) saturate(190%)` with 1px specular light border glow.
   - Strict $H/2$ capsule geometry (`border-radius: 9999px` on all buttons, badges, and selects).
   - macOS 13pt desktop typography standard for crisp, compact readability.
@@ -38,7 +38,7 @@ When copying technical explanations, mathematical derivations, or benchmark tabl
   - Translates unicode mathematical symbols (`→`, `←`, `≥`, `≤`, `≠`, `≈`, `∞`, `·`, `×`) into standard TeX.
 - 📊 **Table Auto-Converter**:
   - Converts tab-separated or multi-space column data (from 2 to 50+ columns) directly into GFM Markdown tables.
-- 📐 **Zorunlu 8 Durum Matrisi (The 8-State Matrix)**:
+- 📐 **The 8-State Matrix**:
   - Interactive coverage for **Empty**, **Loading**, **Success**, **Error (Actionable LaTeX warning)**, **No Results**, **Disabled**, **Confirmation (5s Undo)**, and **Recovery**.
 - ⚡ **Dual-Pane Synchronized Scrolling & Reader Mode**:
   - Smooth, jitter-free scroll synchronization between the Markdown editor and preview pane.
@@ -83,7 +83,7 @@ No build tools, bundlers, or servers required!
 
 ## 🧪 Automated Test Suite
 
-ClarityPad includes an automated test harness with **38 comprehensive tests** testing edge cases in AI outputs, formula detection, table formatting, security, responsive layouts, and Liquid Glass design tokens.
+ClarityPad includes an automated test harness with **48 comprehensive tests** testing edge cases in AI outputs, formula detection, table formatting, security, responsive layouts, and Liquid Glass design tokens.
 
 To run the test suite:
 
@@ -95,7 +95,7 @@ npm test
 node tests/test_claritypad.js
 ```
 
-### Test Coverage Breakdown (38 Tests):
+### Test Coverage Breakdown (48 Tests):
 - **Suite 1: Currency vs Math** — Prevents `$10 ... $5` from becoming broken math.
 - **Suite 2: Math Norms & Formula Delimiters** — Ensures `||x||` balances `\lVert` and `\rVert`.
 - **Suite 3: Code Blocks & Inline Code** — Ensures backticks and fenced code blocks remain untouched.
@@ -108,6 +108,7 @@ node tests/test_claritypad.js
 - **Suite 10: Security & XSS** — Verifies DOMPurify sanitization and `rel="noopener noreferrer"`.
 - **Suite 11: Architecture & Shortcuts** — Tests autosave, print styles, and Tab key indentation.
 - **Suite 12: Liquid Glass UI & 8-State Matrix** — Verifies material physics, H/2 geometry, telemetry bar, and 5-second Undo confirmation toast.
+- **Suite 13: Deterministic Audit Bug Fixes & Heuristics** — Validates math within markdown tables, signed deltas, English prose heuristics ('Set/Let'), preserved user HTML wrappers, 3-column cases environments, safe storage fallback resilience, and bold labels with LaTeX formulas.
 
 ---
 
@@ -116,7 +117,7 @@ node tests/test_claritypad.js
 ```
 claritypad/
 ├── tests/
-│   └── test_claritypad.js    # Automated 38-assertion test suite
+│   └── test_claritypad.js    # Automated 48-assertion test suite
 ├── .gitignore                # Git ignore configuration
 ├── claritypad-release-v4.html# Synchronized release file
 ├── design.md                 # Design system specification (Liquid Glass UI tokens)

@@ -265,7 +265,7 @@ function runAllTests(htmlFilePath) {
   test("Dual-pane split view with editor and live preview is present",
     html.includes("input-pane") && html.includes("preview-shell")
   );
-  test("Zorunlu 8 Durum Matrisi (8-State Matrix) controller is present",
+  test("8-State Matrix controller is present",
     html.includes("triggerState") && html.includes("1. Empty") && html.includes("7. Confirmation (Undo)")
   );
   test("Reader Mode (full width distraction-free view) is implemented",
@@ -275,7 +275,7 @@ function runAllTests(htmlFilePath) {
     html.includes("toggleCommandPalette") && html.includes("cmd-backdrop")
   );
   test("5-second Undo confirmation toast mechanism is implemented",
-    html.includes("undo-toast") && html.includes("Geri Al (5s)")
+    html.includes("undo-toast") && (html.includes("Undo (5s)") || html.includes("Geri Al (5s)"))
   );
 
   // --- SUITE 13: Deterministic Audit Bug Fixes & Heuristics ---

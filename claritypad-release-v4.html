@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ClarityPad — Yapay Zeka Çıktıları için Matematik & Markdown Not Defteri</title>
-  <meta name="description" content="ChatGPT, Claude, Gemini ve DeepSeek'ten kopyalanan dağınık formülleri, bare LaTeX kodlarını ve tabloları Liquid Glass arayüzüyle yayın kalitesine dönüştüren akıllı not defteri." />
+  <title>ClarityPad — The Apple-grade Math & Markdown Notebook for AI Outputs</title>
+  <meta name="description" content="Intelligent notebook converting messy formulas, bare LaTeX commands, and mangled tables from ChatGPT, Claude, Gemini, and DeepSeek into publication-quality notes with a Liquid Glass interface." />
 
   <!-- External Libraries for Math & Markdown Engine -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -851,49 +851,49 @@
       </div>
 
       <div class="toolbar">
-        <button class="primary" onclick="renderPreview()" title="Önizlemeyi Yenile (Cmd/Ctrl + Enter)">Tazele</button>
+        <button class="primary" onclick="renderPreview()" title="Refresh Preview (Cmd/Ctrl + Enter)">Refresh</button>
 
-        <select id="sampleSelect" onchange="loadPresetSample(this.value)" title="Örnek Şablon Yükle">
-          <option value="" disabled selected>Şablonlar...</option>
-          <option value="dl">Derin Öğrenme & LLM</option>
-          <option value="quantum">Kuantum & Matrisler</option>
-          <option value="calculus">Analiz & Parçalı Fonksiyonlar</option>
-          <option value="clear">Notu Temizle</option>
+        <select id="sampleSelect" onchange="loadPresetSample(this.value)" title="Load Preset Sample">
+          <option value="" disabled selected>Presets...</option>
+          <option value="dl">Deep Learning & LLMs</option>
+          <option value="quantum">Quantum & Matrices</option>
+          <option value="calculus">Calculus & Piecewise</option>
+          <option value="clear">Clear Note</option>
         </select>
 
-        <select id="densityMode" class="desktop-only" onchange="toggleDensity()" title="Yoğunluk">
-          <option value="normal">Geniş (Comfort)</option>
-          <option value="compact">Kompakt</option>
+        <select id="densityMode" class="desktop-only" onchange="toggleDensity()" title="Density">
+          <option value="normal">Comfort</option>
+          <option value="compact">Compact</option>
         </select>
 
-        <select id="mathAlign" class="desktop-only" onchange="renderPreview()" title="Formül Hizalama">
-          <option value="left">Formül: Sol</option>
-          <option value="center">Formül: Merkez</option>
+        <select id="mathAlign" class="desktop-only" onchange="renderPreview()" title="Math Alignment">
+          <option value="left">Math: Left</option>
+          <option value="center">Math: Center</option>
         </select>
 
-        <label class="toggle desktop-only" title="Editör ve önizleme kaydırmasını senkronize et">
+        <label class="toggle desktop-only" title="Synchronize editor and preview scroll">
           <input id="syncScroll" type="checkbox" checked />
           Sync
         </label>
 
-        <button onclick="toggleCommandPalette()" title="Komut Paleti (Cmd+K)">⌘K</button>
+        <button onclick="toggleCommandPalette()" title="Command Palette (Cmd+K)">⌘K</button>
 
         <div class="menu-wrap">
-          <button class="icon-btn" id="moreButton" onclick="toggleMoreMenu(event)" aria-label="Daha fazla seçenek" aria-expanded="false">…</button>
+          <button class="icon-btn" id="moreButton" onclick="toggleMoreMenu(event)" aria-label="More options" aria-expanded="false">…</button>
           <div class="menu" id="moreMenu">
-            <div class="menu-header">Dışa Aktarma & Kopyalama</div>
-            <button onclick="copyCleanMarkdown()">⌘ Temiz GFM Markdown Kopyala</button>
-            <button onclick="downloadMarkdown()">⇩ Markdown (.md) İndir</button>
-            <button onclick="copyPreviewHtml()">⌥ Önizleme HTML Kopyala</button>
-            <button onclick="downloadHtml()">⇩ Bağımsız HTML İndir</button>
-            <button onclick="window.print()">⌁ Yazdır / PDF</button>
+            <div class="menu-header">Export & Copy</div>
+            <button onclick="copyCleanMarkdown()">⌘ Copy Clean GFM Markdown</button>
+            <button onclick="downloadMarkdown()">⇩ Download Markdown (.md)</button>
+            <button onclick="copyPreviewHtml()">⌥ Copy Preview HTML</button>
+            <button onclick="downloadHtml()">⇩ Download Standalone HTML</button>
+            <button onclick="window.print()">⌁ Print / PDF</button>
 
             <div class="menu-separator"></div>
-            <div class="menu-header">Görünüm & Düzen</div>
-            <button onclick="toggleReaderMode()">📖 Okuma Modunu Aç/Kapat (Cmd+E)</button>
-            <button onclick="toggleTheme()">◐ Karanlık / Aydınlık Mod</button>
-            <button onclick="cycleMathAlign()">📐 Formül Hizalamasını Değiştir</button>
-            <button onclick="cycleDensity()">⇲ Yoğunluğu Değiştir</button>
+            <div class="menu-header">View & Layout</div>
+            <button onclick="toggleReaderMode()">📖 Toggle Reader Mode (Cmd+E)</button>
+            <button onclick="toggleTheme()">◐ Toggle Dark / Light Mode</button>
+            <button onclick="cycleMathAlign()">📐 Toggle Math Alignment</button>
+            <button onclick="cycleDensity()">⇲ Toggle Density</button>
           </div>
         </div>
       </div>
@@ -908,12 +908,12 @@
       <div class="telemetry-pills">
         <span class="tele-pill" style="color: var(--status-success); background: var(--status-success-bg);">
           <span class="status-dot"></span>
-          <span id="teleStatusText">Canlı Ön İşleme Hazır</span>
+          <span id="teleStatusText">Live Preprocessor Active</span>
         </span>
-        <span class="tele-pill" id="teleFormulasCount">14 Formül Derlendi</span>
-        <span class="tele-pill" id="teleSyntaxStatus">0 Sözdizimi Hatası</span>
+        <span class="tele-pill" id="teleFormulasCount">14 Formulas Compiled</span>
+        <span class="tele-pill" id="teleSyntaxStatus">0 Syntax Errors</span>
       </div>
-      <span style="color: var(--text-tertiary); font-size: 11.5px;">ChatGPT • Claude • Gemini • DeepSeek uyumlu</span>
+      <span style="color: var(--text-tertiary); font-size: 11.5px;">ChatGPT • Claude • Gemini • DeepSeek Compatible</span>
     </div>
   </div>
 
@@ -921,46 +921,46 @@
        CORE DUAL-PANE WORKSPACE
        ======================================================================== -->
   <main class="wrap" id="wrap">
-    <!-- Sol Panel: Ham Yapay Zeka Girdisi -->
+    <!-- Left Pane: Raw AI Input -->
     <section class="pane input-pane liquid-glass">
       <div class="pane-title">
         <div class="pane-title-left">
-          <button class="collapse-editor" onclick="hideEditor()" title="Editörü gizle (Okuma Modu)">‹</button>
-          <span>Yapay Zeka Çıktısı (Ham Metin)</span>
+          <button class="collapse-editor" onclick="hideEditor()" title="Hide editor (Reader Mode)">‹</button>
+          <span>AI Output (Raw Text)</span>
         </div>
         <div class="pane-title-right">
-          <span class="status-dot" id="saveDot" title="Otomatik kaydedildi"></span>
+          <span class="status-dot" id="saveDot" title="Auto-saved"></span>
         </div>
       </div>
-      <textarea id="input" spellcheck="false" placeholder="ChatGPT, Claude, Gemini veya DeepSeek'ten kopyaladığınız teknik metinleri, formülleri ve tabloları buraya yapıştırın. Anında otomatik olarak onarılır..."></textarea>
+      <textarea id="input" spellcheck="false" placeholder="Paste technical text, formulas, and tables copied from ChatGPT, Claude, Gemini, or DeepSeek here. Auto-repaired instantly..."></textarea>
       <div class="hint">
-        <span>Bare LaTeX, normlar ($||x||$), tablolar ve parçalı fonksiyonlar otomatik onarılır.</span>
+        <span>Bare LaTeX, norms ($||x||$), tables, and piecewise functions are automatically repaired.</span>
         <div class="stats" id="stats">
-          <span id="wordCount">0 kelime</span>
-          <span id="charCount">0 karakter</span>
+          <span id="wordCount">0 words</span>
+          <span id="charCount">0 characters</span>
         </div>
       </div>
     </section>
 
-    <!-- Sağ Panel: Yayın Kalitesinde Önizleme -->
+    <!-- Right Pane: Publication-Grade Preview -->
     <section class="pane liquid-glass">
       <div class="pane-title">
-        <span>Yayın Kalitesinde Önizleme</span>
+        <span>Publication-Grade Preview</span>
         <div class="pane-title-right">
-          <span class="status-dot" id="mathStatusDot" title="Tüm formüller kusursuz derlendi"></span>
+          <span class="status-dot" id="mathStatusDot" title="All formulas compiled cleanly"></span>
         </div>
       </div>
       <div class="preview-shell" id="previewShell">
         <article id="preview" class="preview"></article>
       </div>
       <div class="hint">
-        <span>MathJax SVG & GFM Markdown. Dışa aktarma ve yazdırma için '…' menüsünü kullanın.</span>
-        <span id="readTime">~1 dk okuma</span>
+        <span>MathJax SVG & GFM Markdown. Use the '…' menu for export and printing.</span>
+        <span id="readTime">~1 min read</span>
       </div>
     </section>
   </main>
 
-  <button class="show-editor" id="showEditorButton" onclick="showEditor()" title="Editörü Göster">›</button>
+  <button class="show-editor" id="showEditorButton" onclick="showEditor()" title="Show Editor">›</button>
 
   <!-- ========================================================================
        8-STATE MATRIX INTERACTIVE VERIFICATION CONTROLLER
@@ -968,7 +968,7 @@
   <div class="matrix-bar-wrap">
     <div class="matrix-bar liquid-glass">
       <div style="font-size: 12px; font-weight: 700;">
-        <span>Zorunlu 8 Durum Matrisi (The 8-State Matrix):</span>
+        <span>The 8-State Matrix (Verification Controller):</span>
       </div>
       <div class="state-btn-group">
         <button class="state-btn" onclick="triggerState('empty')">1. Empty</button>
@@ -985,33 +985,33 @@
 
   <!-- 5-Second Undo Toast (Confirmation State) -->
   <div class="undo-toast" id="undoToast">
-    <span id="undoToastMessage">Not temizlendi.</span>
-    <button class="undo-btn" id="undoBtnAction" onclick="handleUndo()">Geri Al (5s)</button>
+    <span id="undoToastMessage">Note cleared.</span>
+    <button class="undo-btn" id="undoBtnAction" onclick="handleUndo()">Undo (5s)</button>
   </div>
 
   <!-- Command + K Floating Palette -->
   <div class="cmd-backdrop" id="cmdBackdrop" onclick="toggleCommandPalette(false)">
     <div class="cmd-palette" onclick="event.stopPropagation()">
-      <input type="text" class="cmd-input" id="cmdInput" placeholder="Bir komut yazın (örn: şablon, markdown, temizle, tema)..." autofocus />
+      <input type="text" class="cmd-input" id="cmdInput" placeholder="Type a command (e.g. preset, markdown, clear, theme)..." autofocus />
       <div class="cmd-list">
         <div class="cmd-item" onclick="executeCmd('copy-md')">
-          <span>⌘ Temiz GFM Markdown Kopyala</span>
+          <span>⌘ Copy Clean GFM Markdown</span>
           <span class="cmd-shortcut">Cmd+Shift+C</span>
         </div>
         <div class="cmd-item" onclick="executeCmd('dl-md')">
-          <span>⇩ Markdown (.md) Olarak İndir</span>
+          <span>⇩ Download as Markdown (.md)</span>
           <span class="cmd-shortcut">Cmd+D</span>
         </div>
         <div class="cmd-item" onclick="executeCmd('load-dl')">
-          <span>∑ Derin Öğrenme & Transformer Şablonu Yükle</span>
+          <span>∑ Load Deep Learning & Transformer Preset</span>
           <span class="cmd-shortcut">1</span>
         </div>
         <div class="cmd-item" onclick="executeCmd('toggle-reader')">
-          <span>📖 Okuma Modunu Aç / Kapat</span>
+          <span>📖 Toggle Reader Mode</span>
           <span class="cmd-shortcut">Cmd+E</span>
         </div>
         <div class="cmd-item" onclick="executeCmd('toggle-theme')">
-          <span>◐ Temayı Değiştir (Aydınlık / Karanlık)</span>
+          <span>◐ Toggle Theme (Light / Dark)</span>
           <span class="cmd-shortcut">T</span>
         </div>
       </div>
@@ -1619,10 +1619,10 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
     function updateStats(text) {
       const chars = text.length;
       const words = (text.trim().match(/\S+/g) || []).length;
-      if (wordCountEl) wordCountEl.textContent = `${words} kelime`;
-      if (charCountEl) charCountEl.textContent = `${chars.toLocaleString()} karakter`;
+      if (wordCountEl) wordCountEl.textContent = `${words} words`;
+      if (charCountEl) charCountEl.textContent = `${chars.toLocaleString()} characters`;
       const minutes = Math.max(1, Math.ceil(words / 200));
-      if (readTimeEl) readTimeEl.textContent = `~${minutes} dk okuma`;
+      if (readTimeEl) readTimeEl.textContent = `~${minutes} min read`;
     }
 
     function enhancePreview() {
@@ -1647,7 +1647,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
         if (pre.parentElement && pre.parentElement.classList.contains("code-block-wrapper")) return;
         const codeEl = pre.querySelector("code");
         const langMatch = (codeEl ? codeEl.className : "").match(/language-([a-z0-9_-]+)/i);
-        const langName = langMatch ? langMatch[1] : "kod";
+        const langName = langMatch ? langMatch[1] : "code";
 
         const wrapper = document.createElement("div");
         wrapper.className = "code-block-wrapper";
@@ -1660,12 +1660,12 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
 
         const copyBtn = document.createElement("button");
         copyBtn.className = "code-copy-btn";
-        copyBtn.textContent = "Kopyala";
+        copyBtn.textContent = "Copy";
         copyBtn.onclick = function() {
           const codeText = codeEl ? codeEl.innerText : pre.innerText;
           copyToClipboard(codeText);
-          copyBtn.textContent = "Kopyalandı!";
-          setTimeout(() => { copyBtn.textContent = "Kopyala"; }, 1500);
+          copyBtn.textContent = "Copied!";
+          setTimeout(() => { copyBtn.textContent = "Copy"; }, 1500);
         };
 
         header.appendChild(title);
@@ -1722,20 +1722,20 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
           if (sequence !== renderSequence) return;
           const errors = preview.querySelectorAll("mjx-merror");
           const mathElements = preview.querySelectorAll("mjx-container");
-          if (teleFormulasCount) teleFormulasCount.textContent = `${mathElements.length} Formül Derlendi`;
+          if (teleFormulasCount) teleFormulasCount.textContent = `${mathElements.length} Formulas Compiled`;
           if (errors.length > 0) {
             mathStatusDot.classList.add("error");
-            mathStatusDot.title = `${errors.length} formül sözdizimi hatası`;
-            if (teleSyntaxStatus) teleSyntaxStatus.textContent = `${errors.length} Sözdizimi Hatası (İncele)`;
+            mathStatusDot.title = `${errors.length} formula syntax errors`;
+            if (teleSyntaxStatus) teleSyntaxStatus.textContent = `${errors.length} Syntax Errors (Review)`;
           } else {
             mathStatusDot.classList.remove("error");
-            mathStatusDot.title = "Tüm formüller kusursuz derlendi";
-            if (teleSyntaxStatus) teleSyntaxStatus.textContent = "0 Sözdizimi Hatası";
+            mathStatusDot.title = "All formulas compiled cleanly";
+            if (teleSyntaxStatus) teleSyntaxStatus.textContent = "0 Syntax Errors";
           }
         } catch (e) {
           console.error("MathJax typeset error:", e);
           mathStatusDot.classList.add("error");
-          if (teleSyntaxStatus) teleSyntaxStatus.textContent = "Derleme Hatası";
+          if (teleSyntaxStatus) teleSyntaxStatus.textContent = "Compilation Error";
         }
       }
     }
@@ -1797,13 +1797,13 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
         .trim();
       await copyToClipboard(clean);
       closeMoreMenu();
-      showToast("✓ Temizlenmiş GFM Markdown panoya kopyalandı.");
+      showToast("✓ Cleaned GFM Markdown copied to clipboard.");
     }
 
     async function copyPreviewHtml() {
       await copyToClipboard(preview.innerHTML);
       closeMoreMenu();
-      showToast("✓ Önizleme HTML'i kopyalandı.");
+      showToast("✓ Preview HTML copied to clipboard.");
     }
 
     function downloadMarkdown() {
@@ -1814,22 +1814,22 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "claritypad-notu.md";
+      a.download = "claritypad-note.md";
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       closeMoreMenu();
-      showToast("✓ Markdown (.md) dosyası indirildi.");
+      showToast("✓ Markdown (.md) file downloaded.");
     }
 
     function downloadHtml() {
       const css = document.querySelector("style").innerHTML;
       const isDark = document.body.classList.contains("dark");
       const content = `<!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ClarityPad Not Dışa Aktarma</title>
+  <title>ClarityPad Note Export</title>
   <style>
     ${css}
     body { padding: 40px 20px; }
@@ -1854,8 +1854,8 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
         var text = pre ? pre.innerText : "";
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(text).then(function() {
-            btn.textContent = "Kopyalandı!";
-            setTimeout(function() { btn.textContent = "Kopyala"; }, 1500);
+            btn.textContent = "Copied!";
+            setTimeout(function() { btn.textContent = "Copy"; }, 1500);
           });
         }
       };
@@ -1872,7 +1872,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       closeMoreMenu();
-      showToast("✓ Bağımsız HTML dışa aktarıldı.");
+      showToast("✓ Standalone HTML exported.");
     }
 
     function toggleTheme() {
@@ -1925,11 +1925,11 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
         lastClearedContent = input.value;
         input.value = "";
         renderPreview();
-        showToast("Not temizlendi.", 5000);
+        showToast("Note cleared.", 5000);
       } else if (PRESETS[presetKey]) {
         input.value = PRESETS[presetKey];
         renderPreview();
-        showToast("Örnek şablon yüklendi.");
+        showToast("Sample preset loaded.");
       }
       document.getElementById("sampleSelect").value = "";
     }
@@ -1938,7 +1938,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       if (lastClearedContent) {
         input.value = lastClearedContent;
         renderPreview();
-        showToast("✓ Not başarıyla geri yüklendi (Undo).");
+        showToast("✓ Note successfully restored (Undo).");
         lastClearedContent = "";
       }
     }
@@ -1986,7 +1986,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
         if (e.key === "s" || e.key === "S") {
           e.preventDefault();
           safeSetStorage("clarityPadText", this.value);
-          showToast("✓ Not yerel olarak kaydedildi.");
+          showToast("✓ Note saved locally.");
           return;
         }
         if (e.key === "Enter") {
@@ -2097,29 +2097,29 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       if (state === 'empty') {
         input.value = "";
         renderPreview();
-        showToast("Durum 1: Empty (Boş Karşılama) Ekranı");
+        showToast("State 1: Empty Screen");
       } else if (state === 'loading') {
         saveDot.classList.add("saving");
-        showToast("Durum 2: Loading (Canlı Derleme & Kayıt) Durumu");
+        showToast("State 2: Loading (Live Compilation & Save)");
         setTimeout(() => saveDot.classList.remove("saving"), 2000);
       } else if (state === 'success') {
         loadPresetSample('dl');
-        showToast("Durum 3: Success (Tüm Formüller Başarıyla Derlendi)");
+        showToast("State 3: Success (All Formulas Compiled)");
       } else if (state === 'error') {
-        input.value = "# Hatalı LaTeX Sözdizimi Örneği\n\n\\frac{eksik payda}\n\n\\sqrt[}";
+        input.value = "# Sample LaTeX Syntax Error\n\n\\frac{missing denominator}\n\n\\sqrt[}";
         renderPreview();
-        showToast("Durum 4: Actionable Error (LaTeX Hatası Gösterildi)");
+        showToast("State 4: Actionable Error (LaTeX Syntax Error Displayed)");
       } else if (state === 'no-results') {
-        showToast("Durum 5: No Results (Aranan terim bu belgede bulunamadı)");
+        showToast("State 5: No Results (Search term not found in document)");
       } else if (state === 'disabled') {
-        showToast("Durum 6: Disabled (Salt Okunur Mod Kilidi)");
+        showToast("State 6: Disabled (Read-only Mode Lock)");
       } else if (state === 'confirmation') {
         loadPresetSample('clear');
       } else if (state === 'recovery') {
         const saved = safeGetStorage("clarityPadText") || PRESETS.dl;
         input.value = saved;
         renderPreview();
-        showToast("Durum 8: Recovery (Son oturum localStorage'dan kurtarıldı)");
+        showToast("State 8: Recovery (Session restored from localStorage)");
       }
     }
 

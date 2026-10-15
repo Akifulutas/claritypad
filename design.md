@@ -3,47 +3,47 @@
 
 ---
 
-## 1. Felsefe ve "Anti-AI Slop" Tasarım Yasaları
+## 1. Philosophy and Anti-AI Slop Design Laws
 
-Yapay zeka araçlarının varsayılan çıktıları (ChatGPT, Claude, Gemini, DeepSeek vb.) genellikle her öğeye eşit görsel ağırlık verir, formülleri bozar, tabloları dağıtır ve hiyerarşi kurmaktan kaçınır ("AI slop").
+Default outputs from modern Large Language Models (ChatGPT, Claude, Gemini, DeepSeek, etc.) routinely assign equal visual weight to every element, mangle formulas, shatter markdown tables, and avoid visual hierarchy ("AI slop").
 
-ClarityPad, yapay zekadan kopyalanan bu ham ve dağınık teknik çıktıları **insan elinden çıkmış, yayın kalitesinde kusursuz bir not defterine** dönüştürmek için şu 4 temel yasaya dayanır:
+ClarityPad transforms these raw, disjointed technical outputs into a **publication-grade, human-crafted notebook** based on four foundational laws:
 
-1. **Aksiyon Odaklı Bilgi Mimarisi**:
-   - Pasif sayaçlar yerine, kullanıcının o anki işini çözen durum odaklı geri bildirim:
-     *"14 Formül Derlendi, 0 Sözdizimi Hatası, 2 Tablo Biçimlendirildi • Temiz Markdown Kopyalanmaya Hazır"*.
-2. **Sıfır Temaslı Ön İşleme (Zero-Touch AI Preprocessing)**:
-   - Kullanıcı ham metni yapıştırdığı anda hiçbir ek ayar veya butona basmadan bare LaTeX komutları (`\alpha`, `\frac`, `\sum`), normlar (`||x||`), parçalı fonksiyonlar (`\begin{cases}`) ve para birimleri otomatik olarak ayrıştırılır ve onarılır.
-3. **Tutarlılık ve Tekil Davranış Kuralı**:
-   - Tekil eylem adlandırmaları: "Biçimlendir", "Kopyala", "İndir", "Okuma Modu". Aynı işlem için farklı terimler kullanılmaz.
-4. **İç İçe Kart (Double-Nesting) Yasağı**:
-   - Yalnızca 4 atomik yapı taşı: **Kart**, **Metin/Bağlantı**, **Görsel/Medya** ve **Girdi (Input)**.
-   - Kart içinde çerçeveli kart (padding üstüne padding) kesinlikle yasaktır. Gruplamalar saf beyaz boşluk (whitespace) ve 1px mikro ayırıcılarla yapılır.
+1. **Action-Oriented Information Architecture**:
+   - Rather than passive statistics ("Total 31 items"), provide state-driven feedback addressing the user's immediate job-to-be-done:
+     *"14 Formulas Compiled, 0 Syntax Errors, 2 Tables Formatted • Clean Markdown Ready to Copy"*.
+2. **Zero-Touch AI Preprocessing**:
+   - The instant raw text is pasted—without requiring extra clicks, prompts, or configuration toggles—bare LaTeX commands (`\alpha`, `\frac`, `\sum`), norms (`||x||`), piecewise environments (`\begin{cases}`), and currency amounts (`$15.50`) are automatically parsed and repaired.
+3. **Consistency and Singular Behavior Rule**:
+   - Singular, unambiguous action nomenclature across the entire application: "Format", "Copy", "Download", "Reader Mode". Never alternate between disjointed synonyms for identical actions.
+4. **The Double-Nesting Prohibition**:
+   - Only 4 atomic building blocks: **Card**, **Text / Link**, **Visual / Media**, and **Input**.
+   - A bordered card nested inside another bordered card ("padding on top of padding") is strictly forbidden. Visual grouping is achieved strictly through deliberate whitespace and subtle 1px specular dividers.
 
 ---
 
-## 2. Liquid Glass UI (Sıvı Cam) ve Materyal Fizik Kuralları
+## 2. Liquid Glass UI & Material Physics Rules
 
-Apple macOS Sequoia / visionOS esintili Liquid Glass tasarım sistemi 3 matematiksel kurala dayanır:
+Inspired by Apple macOS Sequoia and visionOS, the Liquid Glass design system is governed by three mathematical and optical rules:
 
-### Kural 1: $H / 2$ Kapsül Geometrisi (Capsule Geometry)
-Tüm butonlar, durum rozetleri ve filtre kapsüllerinin köşe yarıçapı ($r$), yüksekliklerinin tam yarısıdır:
+### Rule 1: $H / 2$ Capsule Geometry
+All interactive buttons, status badges, and filter capsules have a corner radius ($r$) exactly equal to half their height:
 $$r = \frac{h}{2}$$
 - `h = 28px` $\rightarrow$ `border-radius: 14px`
 - `h = 36px` $\rightarrow$ `border-radius: 18px`
 - `h = 44px` $\rightarrow$ `border-radius: 22px`
-- Paneller & Pencereler: Sabit `20px` veya `24px` sürekli eğrilik (squircle).
+- Panels & App Windows: Fixed `20px` or `24px` continuous curvature (squircle).
 
-### Kural 2: Refraction (Kırılma), Frost (Buzlanma) ve Speküler Işıma
-- **Ultra-Thin Material**:
+### Rule 2: Refraction, Frost, and Specular Border Glow
+- **Ultra-Thin Material Physics**:
   ```css
   background: rgba(255, 255, 255, 0.74); /* Light */
   background: rgba(22, 22, 26, 0.72);    /* Dark */
   backdrop-filter: blur(28px) saturate(190%);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
   ```
-- **1px Speküler Kenar Işıması (Specular Border Glow)**:
-  Kartın üst ve sol kenarında ışığın kırıldığı hissini vermek için:
+- **1px Specular Border Glow**:
+  Simulates physical light refracting across the top and left bevel of glass panels:
   ```css
   border: 1px solid var(--glass-border);
   box-shadow:
@@ -51,14 +51,14 @@ $$r = \frac{h}{2}$$
     var(--shadow-ambient);
   ```
 
-### Kural 3: Dinamik Genişleyen Konteynerler (Hug Contents & Spring Physics)
+### Rule 3: Dynamic Expanding Containers (Hug Contents & Spring Physics)
 ```css
 transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 ```
 
 ---
 
-## 3. Renk Paleti ve Tasarım Tokenları
+## 3. Color Palette & Design Tokens
 
 ```css
 :root {
@@ -118,7 +118,7 @@ transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 
 ---
 
-## 4. Tipografi Ölçeği (macOS 13pt Standardı)
+## 4. Typography Scale (macOS 13pt Desktop Standard)
 
 - **Base UI (Body)**: **13pt (13px)** / line-height: 1.55 / weight: 450
 - **Editor Text**: 14px / line-height: 1.65 / `ui-monospace`
@@ -131,15 +131,15 @@ transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 
 ---
 
-## 5. Zorunlu 8 Durum Matrisi (The 8-State Matrix) — Yapay Zeka Çıktılarına Özel
+## 5. The 8-State Matrix — Tailored for AI Outputs
 
-| Durum | Tasarım & Davranış Kuralı | ClarityPad AI Not Defteri Karşılığı |
+| State | Design & Behavioral Rule | ClarityPad AI Notebook Implementation |
 | :--- | :--- | :--- |
-| **1. Empty** | Minimalist odaklanmış karşılama ekranı. | *"ChatGPT, Claude, Gemini çıktısını yapıştırın veya bir örnek şablon yükleyin."* |
-| **2. Loading** | Anlık canlı derleme durumu. | Debounce sırasında sarı durum noktası (`saving` / `rendering`). |
-| **3. Success** | Zümrüt durum rozeti ve formül sayacı. | `● Tüm Formüller Kusursuz Derlendi (14 Formül)` |
-| **4. Error** | Eyleme dönüştürülebilir LaTeX sözdizimi hata kartı. | Kırmızı durum noktası ve `2 Formül Sözdizimi Hatası Bulundu` uyarısı. |
-| **5. No Results** | Arama / filtre boş durumu. | Belgede eşleşen terim bulunamadığında temizleme önerisi. |
-| **6. Disabled** | Düzenleme kilitlendiğinde mikro ipucu. | Okuma modunda salt okunur (read-only) kilit göstergesi. |
-| **7. Confirmation** | Yıkıcı işlemlerde 5 saniyelik geri alma (Undo). | Not temizlendiğinde beliren **5 saniyelik "Geri Al (Undo)"** toast bildirimi. |
-| **8. Recovery** | Kesintiye uğrayan oturumu kurtarma. | Tarayıcı kapansa bile `localStorage`'dan son notu otomatik geri getirme. |
+| **1. Empty** | Minimalist focused greeting and onboarding state. | *"Paste output from ChatGPT, Claude, Gemini, or load a preset sample."* |
+| **2. Loading** | Real-time live compilation & save state. | Debounced amber status dot indicator (`saving` / `rendering`). |
+| **3. Success** | Emerald status badge and formula counter. | `● All Formulas Compiled Cleanly (14 Formulas)` |
+| **4. Error** | Actionable LaTeX syntax error badge and hints. | Red status dot warning and `2 Formula Syntax Errors (Review)`. |
+| **5. No Results** | Search / filter empty state. | Suggestion to clear search filter when no matched query exists in document. |
+| **6. Disabled** | Micro-hint when editing is locked. | Read-only lock indicator when full-width Reader Mode is engaged. |
+| **7. Confirmation** | 5-second non-blocking Undo window for destructive actions. | **5-Second "Undo (5s)"** floating toast notification when note is cleared. |
+| **8. Recovery** | Resilient session recovery across disruptions. | Automatic instant restoration of last session from `localStorage`. |
