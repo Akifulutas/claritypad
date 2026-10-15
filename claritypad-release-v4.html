@@ -1257,7 +1257,12 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
     function existing(l) {
       let t = l.trim();
       if (/^#{1,6}\s/.test(t) || /^```/.test(t) || /^\$\$/.test(t) || /^\\\[/.test(t) || /^<div class=/.test(t)) return true;
-      if (/^\|(?=[^|])(?:[^|]+\|){1,}/.test(t) && !/^\|\|/.test(t) && !/[=+\-*\/^<>]/.test(t.replace(/\|/g, ""))) return true;
+      // GFM Markdown table row detection: starts and ends with pipe, containing at least two cells or separator
+      if (/^\|(?:\s*[^|]+\s*\|){1,}$/.test(t) && !/^\|\|/.test(t)) {
+        const pipeCount = (t.match(/\|/g) || []).length;
+        if (pipeCount >= 3) return true;
+        if (/^\|\s*:?---+:?\s*\|$/.test(t)) return true;
+      }
       return false;
     }
 
@@ -1285,8 +1290,13 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
     }
 
     function hasCmd(t) { return CMDS.some(c => t.includes(c)); }
-    function words(t) { return (t.replace(/\\[a-zA-Z]+/g, "").match(/[A-Za-zÇĞİÖŞÜçğıöşü]{4,}/g) || []); }
-    function hasNaturalText(t) { return words(t).length >= 2; }
+    function words(t) { return (t.replace(/\\[a-zA-Z]+/g, "").match(/[A-Za-zÇĞİÖŞÜçğıöşü]{3,}/g) || []); }
+    function hasNaturalText(t) {
+      const s = t.trim();
+      if (/^(Let|Set|Suppose|Assume|Given|Where|Then|If|Since|Hence|Notice|Note|Here|Therefore)\b/i.test(s)) return true;
+      if (/[.!?]$/.test(s) && !/\\(?:dots|ldots|cdots|[.!?])$/.test(s)) return true;
+      return words(t).length >= 2;
+    }
     function startsMath(t) { return /^(\\[A-Za-z]+|[A-Za-z](_|\^|\(|\{|=)|[-+]?\d|[()[\]{}|])/.test(t.trim()); }
     function tiny(t) {
       return /^[A-Za-z][A-Za-z0-9_']*(\([^)]*\))?$/.test(t) ||
@@ -1304,8 +1314,9 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       if (!t || /^CLARITY(?:MATH|CODE)TOKEN\d+END$/.test(t) || sep(t) || existing(t) || list(t) || heading(t) || labelOnly(t)) return false;
       if (t.length > 250 && !hasCmd(t)) return false;
       if (hasNaturalText(t) && !startsMath(t)) return false;
+      if (/[.!?]$/.test(t) && !/\\(?:dots|ldots|cdots|[.!?])$/.test(t) && !hasCmd(t)) return false;
       if (hasCmd(t)) {
-        if (hasNaturalText(t) && /^[A-Za-zÇĞİÖŞÜçğıöşü]/.test(t)) return false;
+        if (hasNaturalText(t) && /^[A-Za-zÇĞİÖŞÜçğıöşü]/.test(t) && !startsMath(t)) return false;
         return true;
       }
       if (tiny(t)) return true;
@@ -1537,8 +1548,10 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       }
 
       let body = rows.join(" \\\\ ");
+      const maxCols = Math.max(2, ...rows.map(r => (r.match(/&/g) || []).length + 1));
+      const colSpec = "l".repeat(maxCols);
       if (prefix && !/[=]$/.test(prefix.trim())) prefix = prefix + " ";
-      return (prefix ? prefix + " " : "") + "\\left\\{\\begin{array}{ll} " + body + " \\end{array}\\right.";
+      return (prefix ? prefix + " " : "") + "\\left\\{\\begin{array}{" + colSpec + "} " + body + " \\end{array}\\right.";
     }
 
     function maths(lines) {
@@ -1662,10 +1675,27 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
 
     let renderSequence = 0;
 
+    function safeGetStorage(key, fallback = null) {
+      try {
+        return localStorage.getItem(key);
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function safeSetStorage(key, value) {
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
     async function renderPreview() {
       const sequence = ++renderSequence;
       const content = input.value;
-      localStorage.setItem("clarityPadText", content);
+      safeSetStorage("clarityPadText", content);
       updateStats(content);
 
       const doc = prepareDocument(content);
@@ -1673,7 +1703,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       raw = restoreMathHtml(raw, doc.tokens);
 
       if (window.MathJax && window.MathJax.typesetClear) {
-        window.MathJax.typesetClear([preview]);
+        try { window.MathJax.typesetClear([preview]); } catch (e) {}
       }
 
       preview.innerHTML = DOMPurify.sanitize(raw, {
@@ -1701,6 +1731,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
         } catch (e) {
           console.error("MathJax typeset error:", e);
           mathStatusDot.classList.add("error");
+          if (teleSyntaxStatus) teleSyntaxStatus.textContent = "Derleme Hatası";
         }
       }
     }
@@ -1758,7 +1789,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
 
     async function copyCleanMarkdown() {
       const clean = preprocess(input.value)
-        .replace(/<div class="math-display center">|<div class="math-display">|<\/div>/g, "")
+        .replace(/<div class="math-display(?:\s+center)?">([\s\S]*?)<\/div>/g, "$1")
         .trim();
       await copyToClipboard(clean);
       closeMoreMenu();
@@ -1773,7 +1804,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
 
     function downloadMarkdown() {
       const clean = preprocess(input.value)
-        .replace(/<div class="math-display center">|<div class="math-display">|<\/div>/g, "")
+        .replace(/<div class="math-display(?:\s+center)?">([\s\S]*?)<\/div>/g, "$1")
         .trim();
       const blob = new Blob([clean], { type: "text/markdown;charset=utf-8" });
       const url = URL.createObjectURL(blob);
@@ -1781,7 +1812,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       a.href = url;
       a.download = "claritypad-notu.md";
       a.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
       closeMoreMenu();
       showToast("✓ Markdown (.md) dosyası indirildi.");
     }
@@ -1801,7 +1832,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
   </style>
   <script>
     window.MathJax = {
-      tex: { inlineMath: [['\\\\(','\\\\)'],['$','$']], displayMath: [['\\\\[','\\\\]'],['$$','$$']], processEscapes: true, packages: {'[+]': ['ams']} },
+      tex: { inlineMath: [['\\\\(','\\\\)'],['$','$']], displayMath: [['\\\\[','\\\\]'],['$$','$$']], processEscapes: true, packages: {'[+]': ['ams', 'color', 'newcommand']} },
       svg: { fontCache: 'global' }
     };
   <\/script>
@@ -1811,6 +1842,21 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
   <main class="preview">
     ${preview.innerHTML}
   </main>
+  <script>
+    document.querySelectorAll(".code-copy-btn").forEach(function(btn) {
+      btn.onclick = function() {
+        var wrapper = btn.closest(".code-block-wrapper");
+        var pre = wrapper ? wrapper.querySelector("pre") : null;
+        var text = pre ? pre.innerText : "";
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function() {
+            btn.textContent = "Kopyalandı!";
+            setTimeout(function() { btn.textContent = "Kopyala"; }, 1500);
+          });
+        }
+      };
+    });
+  <\/script>
 </body>
 </html>`;
 
@@ -1820,14 +1866,14 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       a.href = url;
       a.download = "claritypad-export.html";
       a.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
       closeMoreMenu();
       showToast("✓ Bağımsız HTML dışa aktarıldı.");
     }
 
     function toggleTheme() {
       document.body.classList.toggle("dark");
-      localStorage.setItem("clarityPadTheme", document.body.classList.contains("dark") ? "dark" : "light");
+      safeSetStorage("clarityPadTheme", document.body.classList.contains("dark") ? "dark" : "light");
       closeMoreMenu();
     }
 
@@ -1935,7 +1981,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       if (e.ctrlKey || e.metaKey) {
         if (e.key === "s" || e.key === "S") {
           e.preventDefault();
-          localStorage.setItem("clarityPadText", this.value);
+          safeSetStorage("clarityPadText", this.value);
           showToast("✓ Not yerel olarak kaydedildi.");
           return;
         }
@@ -1981,13 +2027,15 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
     // Command Palette
     function toggleCommandPalette(force) {
       const palette = document.getElementById("cmdBackdrop");
-      if (force !== undefined) {
-        palette.classList.toggle("open", force);
-      } else {
-        palette.classList.toggle("open");
-      }
-      if (palette.classList.contains("open")) {
-        document.getElementById("cmdInput").focus();
+      const open = force !== undefined ? force : !palette.classList.contains("open");
+      palette.classList.toggle("open", open);
+      if (open) {
+        const inputEl = document.getElementById("cmdInput");
+        if (inputEl) {
+          inputEl.value = "";
+          inputEl.focus();
+        }
+        document.querySelectorAll(".cmd-item").forEach(item => { item.style.display = "flex"; });
       }
     }
 
@@ -2000,10 +2048,39 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       if (cmd === 'toggle-theme') toggleTheme();
     }
 
+    const cmdInputEl = document.getElementById("cmdInput");
+    if (cmdInputEl) {
+      cmdInputEl.addEventListener("input", function() {
+        const query = this.value.toLowerCase().trim();
+        document.querySelectorAll(".cmd-item").forEach(item => {
+          const text = item.textContent.toLowerCase();
+          item.style.display = text.includes(query) ? "flex" : "none";
+        });
+      });
+      cmdInputEl.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const visible = Array.from(document.querySelectorAll(".cmd-item")).find(it => it.style.display !== "none");
+          if (visible) visible.click();
+        }
+      });
+    }
+
     document.addEventListener("keydown", function(e) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         toggleCommandPalette();
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === "c" || e.key === "C")) {
+        e.preventDefault();
+        copyCleanMarkdown();
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && (e.key === "d" || e.key === "D")) {
+        e.preventDefault();
+        downloadMarkdown();
+        return;
       }
       if (e.key === "Escape") {
         toggleCommandPalette(false);
@@ -2035,7 +2112,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       } else if (state === 'confirmation') {
         loadPresetSample('clear');
       } else if (state === 'recovery') {
-        const saved = localStorage.getItem("clarityPadText") || PRESETS.dl;
+        const saved = safeGetStorage("clarityPadText") || PRESETS.dl;
         input.value = saved;
         renderPreview();
         showToast("Durum 8: Recovery (Son oturum localStorage'dan kurtarıldı)");
@@ -2043,7 +2120,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
     }
 
     // System theme detection
-    const savedTheme = localStorage.getItem("clarityPadTheme");
+    const savedTheme = safeGetStorage("clarityPadTheme");
     if (savedTheme === "dark" || (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.body.classList.add("dark");
     }
@@ -2054,9 +2131,12 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
     input.addEventListener("input", () => {
       saveDot.classList.add("saving");
       clearTimeout(window.__inputTimer);
-      window.__inputTimer = setTimeout(() => {
-        renderPreview();
-        saveDot.classList.remove("saving");
+      window.__inputTimer = setTimeout(async () => {
+        try {
+          await renderPreview();
+        } finally {
+          saveDot.classList.remove("saving");
+        }
       }, 250);
     });
 
@@ -2066,7 +2146,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
     }
 
     // Initial load
-    const savedText = localStorage.getItem("clarityPadText");
+    const savedText = safeGetStorage("clarityPadText");
     if (savedText && savedText.trim()) {
       input.value = savedText;
     } else {

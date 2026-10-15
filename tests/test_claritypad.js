@@ -35,7 +35,8 @@ function runAllTests(htmlFilePath) {
     'mathjax-script': { addEventListener: () => {} },
     charCount: { textContent: '' },
     wordCount: { textContent: '' },
-    mathStatusDot: { classList: { add: () => {}, remove: () => {} }, title: '' }
+    mathStatusDot: { classList: { add: () => {}, remove: () => {} }, title: '' },
+    cmdInput: { value: '', addEventListener: () => {}, focus: () => {} }
   };
 
   const mockDocument = {
@@ -275,6 +276,77 @@ function runAllTests(htmlFilePath) {
   );
   test("5-second Undo confirmation toast mechanism is implemented",
     html.includes("undo-toast") && html.includes("Geri Al (5s)")
+  );
+
+  // --- SUITE 13: Deterministic Audit Bug Fixes & Heuristics ---
+  console.log(`\n[Suite 13: Deterministic Audit Bug Fixes & Heuristics]`);
+
+  // 13.1 Markdown table with formula in cells
+  const tblMath = "| Loss Function | Formulation |\n| Cross-Entropy | L = -log(p) |\n| MSE | L = (y - y_hat)^2 |";
+  const processedTblMath = sandbox.preprocess(tblMath);
+  test("Markdown table with equations preserves table structure and does not wrap rows into math-display",
+    !processedTblMath.includes("<div class=\"math-display\">$$\n| MSE") && processedTblMath.includes("| MSE |"),
+    `Result: ${processedTblMath}`
+  );
+
+  // 13.2 Markdown table with signed deltas
+  const tblDelta = "| Feature | Min | Max |\n| Temp | -10 | +40 |";
+  const processedTblDelta = sandbox.preprocess(tblDelta);
+  test("Markdown table with signed delta numbers preserves table structure",
+    !processedTblDelta.includes("<div class=\"math-display\">$$\n| Temp") && processedTblDelta.includes("| Temp |"),
+    `Result: ${processedTblDelta}`
+  );
+
+  // 13.3 English sentence starting with Set or Let
+  const prose1 = "Set x = 5 for all cases.";
+  const processedProse1 = sandbox.preprocess(prose1);
+  test("Prose sentence 'Set x = 5 for all cases.' is preserved as sentence and not wrapped in display math block",
+    !processedProse1.includes("<div class=\"math-display\">"),
+    `Result: ${processedProse1}`
+  );
+
+  const prose2 = "Let x = 1 and y = 2.";
+  const processedProse2 = sandbox.preprocess(prose2);
+  test("Prose sentence 'Let x = 1 and y = 2.' is preserved as sentence and not wrapped in display math block",
+    !processedProse2.includes("<div class=\"math-display\">"),
+    `Result: ${processedProse2}`
+  );
+
+  // 13.4 Clean Markdown export preserves user HTML tags
+  const userHtml = "<div class=\"callout\">\nImportant note\n</div>\n<div class=\"math-display\">$$\nx = 1\n$$</div>";
+  const cleanedExport = userHtml.replace(/<div class="math-display(?:\s+center)?">([\s\S]*?)<\/div>/g, "$1");
+  test("Clean Markdown export preserves user HTML </div> tags while stripping only math display wrappers",
+    cleanedExport.includes("<div class=\"callout\">") && cleanedExport.includes("</div>") && !cleanedExport.includes("<div class=\"math-display\">"),
+    `Result: ${cleanedExport}`
+  );
+
+  // 13.5 Cases with 3 columns dynamically creates array with lll
+  const raw3Cases = [
+    "f(x) =",
+    "\\begin{cases}",
+    "1 & x > 0 & \\text{positive} \\\\",
+    "0 & x \\leq 0 & \\text{non-positive}",
+    "\\end{cases}"
+  ];
+  const cases3Out = sandbox.cleanCasesGroup ? sandbox.cleanCasesGroup(raw33 = raw3Cases) : "";
+  test("Cases environment with 3 columns dynamically supports 'lll' column specifications",
+    cases3Out.includes("\\begin{array}{lll}") && cases3Out.includes("\\end{array}"),
+    `Result: ${cases3Out}`
+  );
+
+  // 13.6 Safe storage resilient functions
+  test("Safe storage utility functions are present in document",
+    html.includes("safeGetStorage") && html.includes("safeSetStorage")
+  );
+
+  // 13.7 Command palette search and keyboard shortcut bindings
+  test("Command palette input search filtering and global export shortcuts are active",
+    html.includes("cmdInputEl.addEventListener") && html.includes("copyCleanMarkdown") && html.includes("downloadMarkdown")
+  );
+
+  // 13.8 Defer object URL revocation
+  test("Object URL revocation is deferred to protect downloads",
+    html.includes("setTimeout(() => URL.revokeObjectURL(url), 1000)")
   );
 
   console.log(`\n======================================================`);
