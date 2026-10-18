@@ -113,7 +113,7 @@ node tests/test_claritypad.js
 - **Suite 9: Unicode Math Translations** — Converts unicode arrows, inequalities, and dots.
 - **Suite 10: Security & XSS** — Verifies DOMPurify sanitization and `rel="noopener noreferrer"`.
 - **Suite 11: Architecture & Shortcuts** — Tests autosave, print styles, and Tab key indentation.
-- **Suite 12: Liquid Glass UI & 8-State Matrix** — Verifies material physics, H/2 geometry, telemetry bar, and 5-second Undo confirmation toast.
+- **Suite 12: Liquid Glass UI & Minimalist Architecture** — Verifies material physics, H/2 geometry, distraction-free layout (no debug banners or clutter bars), and 5-second Undo confirmation toast.
 - **Suite 13: Deterministic Audit Bug Fixes & Heuristics** — Validates math within markdown tables, signed deltas, English prose heuristics ('Set/Let'), preserved user HTML wrappers, 3-column cases environments, safe storage fallback resilience, and bold labels with LaTeX formulas.
 - **Suite 14: Multi-line LaTeX Matrix Environments** — Tests `pmatrix`, `bmatrix`, decimal matrix cells, and prevents row corruption into headings.
 - **Suite 15: AI Reasoning `<think>` Blocks** — Verifies DeepSeek-R1 / o1 collapsible thinking cards and formula containment.

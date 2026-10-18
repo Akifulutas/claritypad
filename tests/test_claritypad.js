@@ -259,14 +259,14 @@ function runAllTests(htmlFilePath) {
   test("H/2 capsule geometry (border-radius: 9999px) is applied",
     html.includes("border-radius: 9999px")
   );
-  test("Action-oriented telemetry bar with formula & syntax counts is present",
-    html.includes("telemetry-bar") && html.includes("teleFormulasCount")
+  test("Distraction-free notebook: telemetry clutter banner and bottom matrix bar are removed",
+    !html.includes("telemetry-banner") && !html.includes("matrix-bar-wrap")
   );
   test("Dual-pane split view with editor and live preview is present",
     html.includes("input-pane") && html.includes("preview-shell")
   );
-  test("8-State Matrix controller is present",
-    html.includes("triggerState") && html.includes("1. Empty") && html.includes("7. Confirmation (Undo)")
+  test("8-State lifecycle controller and 5-second Undo confirmation toast are active",
+    html.includes("undo-toast") && (html.includes("Undo (5s)") || html.includes("Geri Al (5s)")) && html.includes("handleUndo")
   );
   test("Reader Mode (full width distraction-free view) is implemented",
     html.includes("toggleReaderMode") && html.includes("reading-only") && html.includes("collapse-editor")

@@ -323,48 +323,13 @@
       font-weight: 750;
     }
 
-    /* Action-Oriented Telemetry Bar */
-    .telemetry-banner {
-      max-width: 1440px;
-      margin: 12px auto 0;
-      padding: 0 16px;
-    }
-
-    .telemetry-bar {
-      padding: 8px 16px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 12px;
-    }
-
-    .telemetry-pills {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .tele-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 9999px;
-      background: var(--glass-panel);
-      border: 1px solid var(--glass-border);
-    }
-
     /* Dual Pane Workspace */
     .wrap {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 14px;
-      min-height: calc(100vh - 120px);
-      padding: 14px 16px 40px;
+      min-height: calc(100vh - 82px);
+      padding: 16px 20px 30px;
       max-width: 1440px;
       margin: 0 auto;
     }
@@ -836,35 +801,6 @@
     .compact .preview h2 { font-size: 20px; margin-top: 22px; }
     .compact .preview h3 { font-size: 16px; margin-top: 18px; }
 
-    /* 8-State Matrix Interactive Verification Bar */
-    .matrix-bar-wrap {
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 0 16px 24px;
-    }
-
-    .matrix-bar {
-      padding: 10px 16px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .state-btn-group {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .state-btn {
-      font-size: 11px;
-      padding: 4px 9px;
-      border-radius: 9999px;
-    }
-
     /* 5-Second Undo Toast (Confirmation State) */
     .undo-toast {
       position: fixed;
@@ -977,7 +913,7 @@
     }
 
     @media print {
-      .app-header, .telemetry-banner, .matrix-bar-wrap, .input-pane, .pane-title, .hint, .show-editor, .undo-toast, .cmd-backdrop, .code-copy-btn, .math-copy-btn {
+      .app-header, .input-pane, .pane-title, .hint, .show-editor, .undo-toast, .cmd-backdrop, .code-copy-btn, .math-copy-btn {
         display: none !important;
       }
       body { background: #ffffff !important; color: #111827 !important; }
@@ -1059,23 +995,6 @@
   </header>
 
   <!-- ========================================================================
-       ACTION-ORIENTED TELEMETRY BANNER
-       ======================================================================== -->
-  <div class="telemetry-banner">
-    <div class="telemetry-bar liquid-glass">
-      <div class="telemetry-pills">
-        <span class="tele-pill" style="color: var(--status-success); background: var(--status-success-bg);">
-          <span class="status-dot"></span>
-          <span id="teleStatusText">Live Preprocessor Active</span>
-        </span>
-        <span class="tele-pill" id="teleFormulasCount">14 Formulas Compiled</span>
-        <span class="tele-pill" id="teleSyntaxStatus">0 Syntax Errors</span>
-      </div>
-      <span style="color: var(--text-tertiary); font-size: 11.5px;">ChatGPT • Claude • Gemini • DeepSeek Compatible</span>
-    </div>
-  </div>
-
-  <!-- ========================================================================
        CORE DUAL-PANE WORKSPACE
        ======================================================================== -->
   <main class="wrap" id="wrap">
@@ -1120,27 +1039,6 @@
   </main>
 
   <button class="show-editor" id="showEditorButton" onclick="showEditor()" title="Show Editor">›</button>
-
-  <!-- ========================================================================
-       8-STATE MATRIX INTERACTIVE VERIFICATION CONTROLLER
-       ======================================================================== -->
-  <div class="matrix-bar-wrap">
-    <div class="matrix-bar liquid-glass">
-      <div style="font-size: 12px; font-weight: 700;">
-        <span>The 8-State Matrix (Verification Controller):</span>
-      </div>
-      <div class="state-btn-group">
-        <button class="state-btn" onclick="triggerState('empty')">1. Empty</button>
-        <button class="state-btn" onclick="triggerState('loading')">2. Loading</button>
-        <button class="state-btn" onclick="triggerState('success')">3. Success</button>
-        <button class="state-btn" onclick="triggerState('error')">4. Error (Actionable)</button>
-        <button class="state-btn" onclick="triggerState('no-results')">5. No Results</button>
-        <button class="state-btn" onclick="triggerState('disabled')">6. Disabled</button>
-        <button class="state-btn" onclick="triggerState('confirmation')">7. Confirmation (Undo)</button>
-        <button class="state-btn" onclick="triggerState('recovery')">8. Recovery</button>
-      </div>
-    </div>
-  </div>
 
   <!-- 5-Second Undo Toast (Confirmation State) -->
   <div class="undo-toast" id="undoToast">
@@ -1193,8 +1091,6 @@
     const wordCountEl = document.getElementById("wordCount");
     const charCountEl = document.getElementById("charCount");
     const readTimeEl = document.getElementById("readTime");
-    const teleFormulasCount = document.getElementById("teleFormulasCount");
-    const teleSyntaxStatus = document.getElementById("teleSyntaxStatus");
 
     marked.setOptions({ gfm: true, breaks: false, mangle: false, headerIds: false });
 
@@ -2062,21 +1958,17 @@ Where the transition matrix spectrum governs the rate of geometric convergence.
           await window.MathJax.typesetPromise([preview]);
           if (sequence !== renderSequence) return;
           const errors = preview.querySelectorAll("mjx-merror");
-          const mathElements = preview.querySelectorAll("mjx-container");
-          if (teleFormulasCount) teleFormulasCount.textContent = `${mathElements.length} Formulas Compiled`;
           if (errors.length > 0) {
             mathStatusDot.classList.add("error");
-            mathStatusDot.title = `${errors.length} formula syntax errors`;
-            if (teleSyntaxStatus) teleSyntaxStatus.textContent = `${errors.length} Syntax Errors (Review)`;
+            mathStatusDot.title = `${errors.length} formula syntax error${errors.length > 1 ? "s" : ""}`;
           } else {
             mathStatusDot.classList.remove("error");
             mathStatusDot.title = "All formulas compiled cleanly";
-            if (teleSyntaxStatus) teleSyntaxStatus.textContent = "0 Syntax Errors";
           }
         } catch (e) {
           console.error("MathJax typeset error:", e);
           mathStatusDot.classList.add("error");
-          if (teleSyntaxStatus) teleSyntaxStatus.textContent = "Compilation Error";
+          mathStatusDot.title = "Formula compilation error";
         }
       }
     }
