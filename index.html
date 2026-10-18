@@ -657,7 +657,47 @@
     .math-display {
       margin: 18px 0;
       overflow-x: auto;
-      padding: 4px 0;
+      padding: 10px 14px;
+      position: relative;
+      border-radius: 12px;
+      transition: background 0.2s ease;
+    }
+
+    .math-display:hover {
+      background: rgba(0, 0, 0, 0.02);
+    }
+    .dark .math-display:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .math-copy-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      opacity: 0;
+      pointer-events: none;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      background: var(--glass-surface-raised);
+      color: var(--text-secondary);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-ambient);
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+      z-index: 5;
+    }
+
+    .math-display:hover .math-copy-btn {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .math-copy-btn:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
     }
 
     .math-display.center mjx-container[display="true"] {
@@ -672,6 +712,119 @@
       border-radius: 6px;
       font-size: 12px;
     }
+
+    /* GitHub / AI Callouts & Admonitions */
+    .callout {
+      border-radius: 14px;
+      margin: 18px 0;
+      padding: 14px 18px;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      box-shadow: inset 0 1px 1px 0 var(--glass-border-specular), var(--shadow-ambient);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .callout::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      border-radius: 4px 0 0 4px;
+    }
+
+    .callout-note::before { background: var(--accent); }
+    .callout-tip::before { background: var(--status-success); }
+    .callout-important::before { background: #af52de; }
+    .callout-warning::before { background: var(--status-warning); }
+    .callout-caution::before { background: var(--status-error); }
+
+    .callout-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 12.5px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .callout-note .callout-header { color: var(--accent); }
+    .callout-tip .callout-header { color: var(--status-success); }
+    .callout-important .callout-header { color: #af52de; }
+    .callout-warning .callout-header { color: var(--status-warning); }
+    .callout-caution .callout-header { color: var(--status-error); }
+
+    .callout-body {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+    }
+    .callout-body p:last-child { margin-bottom: 0; }
+
+    /* AI Reasoning / Think Block (DeepSeek-R1 / Claude 3.7 / o1) */
+    .think-card {
+      border-radius: 14px;
+      margin: 18px 0;
+      background: rgba(147, 51, 234, 0.04);
+      border: 1px solid rgba(147, 51, 234, 0.18);
+      box-shadow: inset 0 1px 1px 0 var(--glass-border-specular), var(--shadow-ambient);
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .dark .think-card {
+      background: rgba(168, 85, 247, 0.07);
+      border-color: rgba(168, 85, 247, 0.25);
+    }
+
+    .think-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+      font-size: 12.5px;
+      color: #9333ea;
+      background: rgba(147, 51, 234, 0.07);
+      transition: background 0.15s ease;
+    }
+
+    .dark .think-summary {
+      color: #c084fc;
+      background: rgba(168, 85, 247, 0.12);
+    }
+
+    .think-card[open] .think-summary {
+      border-bottom: 1px solid rgba(147, 51, 234, 0.15);
+    }
+
+    .think-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: rgba(147, 51, 234, 0.14);
+      color: #9333ea;
+    }
+    .dark .think-badge {
+      background: rgba(168, 85, 247, 0.22);
+      color: #e9d5ff;
+    }
+
+    .think-body {
+      padding: 14px 18px;
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+    .think-body p:last-child { margin-bottom: 0; }
 
     /* Density mode */
     .compact .preview {
@@ -824,7 +977,7 @@
     }
 
     @media print {
-      .app-header, .telemetry-banner, .matrix-bar-wrap, .input-pane, .pane-title, .hint, .show-editor {
+      .app-header, .telemetry-banner, .matrix-bar-wrap, .input-pane, .pane-title, .hint, .show-editor, .undo-toast, .cmd-backdrop, .code-copy-btn, .math-copy-btn {
         display: none !important;
       }
       body { background: #ffffff !important; color: #111827 !important; }
@@ -832,6 +985,10 @@
       .pane { border: 0 !important; display: block !important; box-shadow: none !important; background: #ffffff !important; }
       .preview-shell { overflow: visible !important; background: #ffffff !important; }
       .preview { color: #111827 !important; max-width: 100% !important; padding: 0 !important; }
+      .math-display, .code-block-wrapper, table, .callout, .think-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
     }
   </style>
 </head>
@@ -858,6 +1015,7 @@
           <option value="dl">Deep Learning & LLMs</option>
           <option value="quantum">Quantum & Matrices</option>
           <option value="calculus">Calculus & Piecewise</option>
+          <option value="deepseek">DeepSeek-R1 & Reasoning</option>
           <option value="clear">Clear Note</option>
         </select>
 
@@ -938,6 +1096,7 @@
         <div class="stats" id="stats">
           <span id="wordCount">0 words</span>
           <span id="charCount">0 characters</span>
+          <span id="tokenCount">~0 tokens</span>
         </div>
       </div>
     </section>
@@ -1005,6 +1164,10 @@
         <div class="cmd-item" onclick="executeCmd('load-dl')">
           <span>∑ Load Deep Learning & Transformer Preset</span>
           <span class="cmd-shortcut">1</span>
+        </div>
+        <div class="cmd-item" onclick="executeCmd('load-deepseek')">
+          <span>🧠 Load DeepSeek-R1 Reasoning Preset</span>
+          <span class="cmd-shortcut">2</span>
         </div>
         <div class="cmd-item" onclick="executeCmd('toggle-reader')">
           <span>📖 Toggle Reader Mode</span>
@@ -1139,6 +1302,42 @@ f(x) = \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!} (x - a)^n = f(a) + f'(a)(x-a
 The probability density function:
 
 p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x - \\mu)^2}{2\\sigma^2}\\right)
+`,
+
+      deepseek: `# DeepSeek-R1 Reasoning & Matrix Synthesis
+
+> [!TIP]
+> This synthesis demonstrates automatic \`<think>\` block collapsing, GitHub callout styling, and multi-line matrix recovery.
+
+<think>
+We are asked to solve for the steady-state distribution of a two-state Markov chain.
+The transition probability matrix P is given by:
+P =
+\\begin{pmatrix}
+1 - p & p \\\\
+q & 1 - q
+\\end{pmatrix}
+
+The stationary condition requires \\pi P = \\pi subject to \\sum \\pi_i = 1.
+For state 1:
+\\pi_1 (1 - p) + \\pi_2 q = \\pi_1 \\implies \\pi_1 p = \\pi_2 q
+Substituting \\pi_2 = 1 - \\pi_1:
+\\pi_1 p = (1 - \\pi_1) q \\implies \\pi_1 (p + q) = q
+Hence:
+\\pi_1 = \\frac{q}{p + q}, \\quad \\pi_2 = \\frac{p}{p + q}
+</think>
+
+1. Stationary Distribution Solution
+The stationary probability vector $\\pi = [\\pi_1, \\pi_2]$ satisfies:
+
+\\pi = \\begin{bmatrix} \\frac{q}{p+q} & \\frac{p}{p+q} \\end{bmatrix}
+
+2. Verification via Convergence
+Let the difference error be bounded by:
+
+\\|\\pi^{(t)} - \\pi^*\\| \\leq |1 - p - q|^t \\|\\pi^{(0)} - \\pi^*\\|
+
+Where the transition matrix spectrum governs the rate of geometric convergence.
 `
     };
 
@@ -1235,12 +1434,12 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       const centered = alignEl && alignEl.value === "center";
       tokens.filter(item => item.display).forEach(function(item) {
         const cls = centered ? "math-display center" : "math-display";
-        const value = '<div class="' + cls + '">\\[' + escapeHtml(item.tex) + '\\]</div>';
+        const value = '<div class="' + cls + '" data-tex="' + escapeHtml(item.tex) + '">\\[' + escapeHtml(item.tex) + '\\]</div>';
         html = html.replaceAll("<p>" + item.token + "</p>", value);
         html = html.replaceAll(item.token, value);
       });
       tokens.filter(item => !item.display).forEach(function(item) {
-        const value = '<span class="math-inline">\\(' + escapeHtml(item.tex) + '\\)</span>';
+        const value = '<span class="math-inline" data-tex="' + escapeHtml(item.tex) + '">\\(' + escapeHtml(item.tex) + '\\)</span>';
         html = html.replaceAll(item.token, value);
       });
       return html;
@@ -1276,13 +1475,32 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       return false;
     }
 
+    const LATEX_ENVS = [
+      "cases", "matrix", "pmatrix", "bmatrix", "vmatrix", "Bmatrix", "Vmatrix",
+      "array", "align", "align\\*", "aligned", "gather", "gather\\*", "gathered",
+      "split", "multline", "equation", "equation\\*"
+    ];
+    const LATEX_ENV_REGEX = new RegExp("\\\\begin\\{(" + LATEX_ENVS.join("|") + ")\\}");
+
+    function getLatexEnvBegin(t) {
+      const m = t.match(LATEX_ENV_REGEX);
+      return m ? m[1] : null;
+    }
+
+    function isEnvEnd(t, env) {
+      if (!env) return false;
+      const escaped = env.replace(/\*/g, "\\*");
+      return new RegExp("\\\\end\\{" + escaped + "\\}").test(t);
+    }
+
     function heading(l) {
       let t = l.trim();
-      if (!t || existing(t)) return false;
+      if (!t || existing(t) || getLatexEnvBegin(t)) return false;
+      if (/[&\\=]/.test(t) && !/^INFO/i.test(t)) return false;
       if (t.length > 110) return false;
       if (/^INFO\s*\d*/i.test(t)) return "h1";
-      if (/^\d+\.\d+(\.\d+)?\s+\S/.test(t)) return "h3";
-      if (/^\d+\.\s+\S/.test(t)) {
+      if (/^\d+\.\d+(\.\d+)?\s+[A-Za-zÇĞİÖŞÜçğıöşü]/.test(t)) return "h3";
+      if (/^\d+\.\s+[A-Za-zÇĞİÖŞÜçğıöşü]/.test(t)) {
         let body = t.replace(/^\d+\.\s+/, "").trim();
         if (body.length <= 85 && !/[.!?]$/.test(body)) return "h2";
       }
@@ -1312,6 +1530,8 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
     function formula(l) {
       let t = l.trim();
       if (!t || /^CLARITY(?:MATH|CODE)TOKEN\d+END$/.test(t) || sep(t) || existing(t) || list(t) || heading(t) || labelOnly(t)) return false;
+      if (/^<\/?(?:div|details|summary|span|p|pre|code|table|thead|tbody|tr|td|th|section|aside|think|button|a)\b[^>]*>$/i.test(t)) return false;
+      if (/<think>|<\/think>|<details|<\/details>|<summary|<\/summary>/i.test(t)) return false;
       if (t.length > 250 && !hasCmd(t)) return false;
       if (hasNaturalText(t) && !startsMath(t)) return false;
       if (/[.!?]$/.test(t) && !/\\(?:dots|ldots|cdots|[.!?])$/.test(t) && !hasCmd(t)) return false;
@@ -1321,7 +1541,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       }
       if (tiny(t)) return true;
       let c = t.replace(/\s+/g, "");
-      if (/[=+\-*/^_{}()[\]|<>]/.test(c) && c.length <= 160 && /^[A-Za-z0-9_{}()[\]|.,;:'+\-*/^=<>€\\%]+$/.test(c)) {
+      if (/[=+\-*/^_{}()[\]|<>&]/.test(c) && c.length <= 160 && /^[A-Za-z0-9_{}()[\]|.,;:'+\-*/^=<>€\\%&]+$/.test(c)) {
         if (hasNaturalText(t)) return false;
         return true;
       }
@@ -1456,11 +1676,12 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
         return key;
       }
 
-      // Protect existing math/code tokens from being mangled or re-wrapped by inline heuristics
+      // Protect existing math/code tokens and HTML tags from being mangled or re-wrapped by inline heuristics
       s = s.replace(/CLARITY(?:MATH|CODE)TOKEN\d+END/g, x => holdLiteral(x));
       s = s.replace(/(`+)([^\n]*?)\1/g, x => holdLiteral(x));
       s = s.replace(/!?\[[^\]\n]*\]\([^\s)]+(?:\s+"[^"]*")?\)/g, x => holdLiteral(x));
       s = s.replace(/https?:\/\/[^\s<]+/g, x => holdLiteral(x));
+      s = s.replace(/<[a-z/][^>]*>/gi, x => holdLiteral(x));
 
       function isMathyChunk(x) {
         if (!x || !x.trim() || x.includes("@@MATH") || /CLARITY(?:MATH|CODE)TOKEN/.test(x)) return false;
@@ -1558,6 +1779,58 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       return (prefix ? prefix + " " : "") + "\\left\\{\\begin{array}{" + colSpec + "} " + body + " \\end{array}\\right.";
     }
 
+    function cleanEnvGroup(env, lines) {
+      if (env === "cases") return cleanCasesGroup(lines);
+      let raw = lines.map(x => x.trim()).filter(Boolean);
+      let prefix = "";
+      let rows = [];
+      let inside = false;
+      const beginRe = new RegExp("\\\\begin\\{" + env.replace(/\*/g, "\\*") + "\\}");
+      const endRe = new RegExp("\\\\end\\{" + env.replace(/\*/g, "\\*") + "\\}");
+
+      for (let line of raw) {
+        line = protect(line);
+        if (beginRe.test(line)) {
+          inside = true;
+          let before = line.split(beginRe)[0].trim();
+          if (before) prefix = before;
+          let after = line.split(beginRe).slice(1).join("").trim();
+          if (after && !endRe.test(after)) rows.push(after);
+          if (endRe.test(after)) {
+            let rowPart = after.split(endRe)[0].trim();
+            if (rowPart) rows.push(rowPart);
+            inside = false;
+          }
+          continue;
+        }
+        if (endRe.test(line)) {
+          let before = line.split(endRe)[0].trim();
+          if (before) rows.push(before);
+          inside = false;
+          continue;
+        }
+        if (inside) {
+          rows.push(line);
+        } else if (!prefix && line) {
+          prefix = line;
+        }
+      }
+
+      let formattedRows = rows
+        .map(r => r.replace(/\\\\\s*$/, "").trim())
+        .filter(Boolean)
+        .map(r => r.replace(/\s*&\s*/g, " & "));
+
+      let body = formattedRows.join(" \\\\ ");
+      let res = `\\begin{${env}} ${body} \\end{${env}}`;
+      if (prefix) {
+        prefix = prefix.trim();
+        if (!/[=+\-*/]$/.test(prefix)) prefix += " ";
+        res = prefix + " " + res;
+      }
+      return res;
+    }
+
     function maths(lines) {
       let out = [], i = 0, inCode = false, inManual = false;
       while (i < lines.length) {
@@ -1566,26 +1839,41 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
         if (/^\$\$/.test(t) || /^\\\[/.test(t)) { inManual = !inManual; out.push(l); i++; continue; }
         if (!inCode && !inManual && sep(t)) { out.push("\n---\n"); i++; continue; }
 
-        if (!inCode && !inManual && !list(t) && !heading(t) && (isCasesBegin(t) || (formula(l) && i + 1 < lines.length && isCasesBegin(lines[i + 1].trim())))) {
+        const envName = getLatexEnvBegin(t) || (formula(l) && i + 1 < lines.length ? getLatexEnvBegin(lines[i + 1].trim()) : null);
+        if (!inCode && !inManual && !list(t) && !heading(t) && envName) {
           let g = [], j = i, found = false;
-          while (j < lines.length && j - i < 30) {
+          while (j < lines.length && j - i < 60) {
             g.push(lines[j]);
-            if (isCasesEnd(lines[j].trim())) { found = true; j++; break; }
+            if (isEnvEnd(lines[j].trim(), envName)) { found = true; j++; break; }
             j++;
           }
           if (found) {
             i = j;
-            out.push("\n" + mathBlock(cleanCasesGroup(g)) + "\n");
+            const isQuoted = g.every(x => /^\s*>/.test(x));
+            const cleanLines = isQuoted ? g.map(x => x.replace(/^\s*>+\s*/, "")) : g;
+            const cleaned = cleanEnvGroup(envName, cleanLines);
+            if (isQuoted) {
+              out.push("\n> " + mathBlock(cleaned).replace(/\n/g, "\n> ") + "\n");
+            } else {
+              out.push("\n" + mathBlock(cleaned) + "\n");
+            }
             continue;
           }
         }
 
         if (!inCode && !inManual && formula(l)) {
           let g = [];
-          while (i < lines.length && formula(lines[i]) && !isCasesBegin(lines[i].trim())) {
+          while (i < lines.length && formula(lines[i]) && !getLatexEnvBegin(lines[i].trim())) {
             g.push(lines[i++]);
           }
-          out.push("\n" + mathBlock(cleanGroup(g)) + "\n");
+          const isQuoted = g.every(x => /^\s*>/.test(x));
+          const cleanLines = isQuoted ? g.map(x => x.replace(/^\s*>+\s*/, "")) : g;
+          const cleaned = cleanGroup(cleanLines);
+          if (isQuoted) {
+            out.push("\n> " + mathBlock(cleaned).replace(/\n/g, "\n> ") + "\n");
+          } else {
+            out.push("\n" + mathBlock(cleaned) + "\n");
+          }
           continue;
         }
 
@@ -1596,6 +1884,11 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
     }
 
     function preprocessCore(text) {
+      // Automatic conversion of <think>...</think> reasoning blocks into collapsible cards
+      text = text.replace(/<think>([\s\S]*?)<\/think>/gi, function(_, content) {
+        return `\n<details class="think-card liquid-glass" open>\n<summary class="think-summary"><span>🧠 AI Thinking Process</span><span class="think-badge">Chain of Thought</span></summary>\n<div class="think-body">\n\n${content.trim()}\n\n</div>\n</details>\n`;
+      });
+
       let lines = norm(text).split("\n");
       lines = tables(lines);
       lines = heads(lines);
@@ -1619,8 +1912,11 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
     function updateStats(text) {
       const chars = text.length;
       const words = (text.trim().match(/\S+/g) || []).length;
+      const tokens = Math.round(chars / 3.8);
       if (wordCountEl) wordCountEl.textContent = `${words} words`;
       if (charCountEl) charCountEl.textContent = `${chars.toLocaleString()} characters`;
+      const tokenCountEl = document.getElementById("tokenCount");
+      if (tokenCountEl) tokenCountEl.textContent = `~${tokens.toLocaleString()} tokens`;
       const minutes = Math.max(1, Math.ceil(words / 200));
       if (readTimeEl) readTimeEl.textContent = `~${minutes} min read`;
     }
@@ -1639,6 +1935,51 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
         if (/^https?:/i.test(link.getAttribute("href") || "")) {
           link.target = "_blank";
           link.rel = "noopener noreferrer";
+        }
+      });
+
+      // Display math blocks with 1-click Copy LaTeX button
+      preview.querySelectorAll(".math-display").forEach(function(el) {
+        if (el.querySelector(".math-copy-btn")) return;
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "math-copy-btn";
+        copyBtn.textContent = "Copy LaTeX";
+        copyBtn.title = "Copy raw LaTeX formula to clipboard";
+        copyBtn.onclick = function(e) {
+          e.stopPropagation();
+          const tex = el.getAttribute("data-tex") || el.innerText;
+          copyToClipboard(tex);
+          copyBtn.textContent = "Copied!";
+          setTimeout(() => { copyBtn.textContent = "Copy LaTeX"; }, 1500);
+        };
+        el.appendChild(copyBtn);
+      });
+
+      // GitHub / AI-style callouts & admonitions
+      preview.querySelectorAll("blockquote").forEach(function(bq) {
+        if (bq.classList.contains("callout")) return;
+        const firstP = bq.querySelector("p");
+        if (!firstP) return;
+        const m = firstP.innerHTML.match(/^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*(?:<br\s*\/?>)?([\s\S]*)$/i);
+        if (m) {
+          const type = m[1].toUpperCase();
+          const rest = m[2];
+          bq.classList.add("callout", "callout-" + type.toLowerCase(), "liquid-glass");
+
+          const header = document.createElement("div");
+          header.className = "callout-header";
+          const icon = type === "NOTE" ? "ℹ️" :
+                       type === "TIP" ? "💡" :
+                       type === "IMPORTANT" ? "📌" :
+                       type === "WARNING" ? "⚠️" : "🛑";
+          header.innerHTML = '<span class="callout-icon">' + icon + '</span><span class="callout-title">' + type + '</span>';
+
+          if (rest.trim()) {
+            firstP.innerHTML = rest;
+          } else {
+            firstP.remove();
+          }
+          bq.insertBefore(header, bq.firstChild);
         }
       });
 
@@ -1711,7 +2052,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       }
 
       preview.innerHTML = DOMPurify.sanitize(raw, {
-        ADD_ATTR: ["class", "target", "rel"]
+        ADD_ATTR: ["class", "target", "rel", "open", "data-tex"]
       });
 
       enhancePreview();
@@ -1793,7 +2134,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
 
     async function copyCleanMarkdown() {
       const clean = preprocess(input.value)
-        .replace(/<div class="math-display(?:\s+center)?">([\s\S]*?)<\/div>/g, "$1")
+        .replace(/<div class="math-display(?:\s+center)?"[^>]*>([\s\S]*?)<\/div>/g, "$1")
         .trim();
       await copyToClipboard(clean);
       closeMoreMenu();
@@ -1808,7 +2149,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
 
     function downloadMarkdown() {
       const clean = preprocess(input.value)
-        .replace(/<div class="math-display(?:\s+center)?">([\s\S]*?)<\/div>/g, "$1")
+        .replace(/<div class="math-display(?:\s+center)?"[^>]*>([\s\S]*?)<\/div>/g, "$1")
         .trim();
       const blob = new Blob([clean], { type: "text/markdown;charset=utf-8" });
       const url = URL.createObjectURL(blob);
@@ -2048,6 +2389,7 @@ p(x; \\mu, \\sigma^2) = \\frac{1}{\\sigma \\sqrt{2\\pi}} \\exp\\left(-\\frac{(x 
       if (cmd === 'copy-md') copyCleanMarkdown();
       if (cmd === 'dl-md') downloadMarkdown();
       if (cmd === 'load-dl') loadPresetSample('dl');
+      if (cmd === 'load-deepseek') loadPresetSample('deepseek');
       if (cmd === 'toggle-reader') toggleReaderMode();
       if (cmd === 'toggle-theme') toggleTheme();
     }

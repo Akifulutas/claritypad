@@ -143,3 +143,23 @@ transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 | **6. Disabled** | Micro-hint when editing is locked. | Read-only lock indicator when full-width Reader Mode is engaged. |
 | **7. Confirmation** | 5-second non-blocking Undo window for destructive actions. | **5-Second "Undo (5s)"** floating toast notification when note is cleared. |
 | **8. Recovery** | Resilient session recovery across disruptions. | Automatic instant restoration of last session from `localStorage`. |
+
+---
+
+## 6. AI Reasoning, Admonitions & Math Interaction Components
+
+### 6.1 AI Chain of Thought (`.think-card`)
+- Used for raw `<think>...</think>` reasoning outputs (DeepSeek-R1, OpenAI o1, Claude 3.7 Sonnet).
+- Optical token: `background: rgba(147, 51, 234, 0.04)` (Dark: `rgba(168, 85, 247, 0.07)`), border `1px solid rgba(147, 51, 234, 0.18)`.
+- Collapsible interactive `<details open>` with `<summary class="think-summary">` header and purple capsule badge.
+- Inner text italicized with 1.65 line-height and math delimiters preserved.
+
+### 6.2 GitHub / AI Admonitions (`.callout`)
+- Parses `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, and `> [!CAUTION]`.
+- 4px vertical accent stripe on left edge with color-coded typography and emoji icons.
+- Avoids double-nesting by styling markdown `blockquote` elements directly into Liquid Glass cards.
+
+### 6.3 Formula Copy & Math Actions (`.math-copy-btn`)
+- Every `.math-display` element stores the unparsed, pristine LaTeX equation in `data-tex`.
+- On cursor hover, a smooth $H/2$ capsule button floats at the top-right corner (`opacity: 1`, `z-index: 5`), providing 1-click clipboard copy of raw LaTeX.
+

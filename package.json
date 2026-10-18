@@ -1,6 +1,6 @@
 {
   "name": "claritypad",
-  "version": "5.2.0",
+  "version": "5.3.0",
   "description": "The Apple-grade Math & Markdown Notebook for AI outputs (ChatGPT, Claude, Gemini, DeepSeek)",
   "main": "index.html",
   "scripts": {

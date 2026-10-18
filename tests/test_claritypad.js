@@ -357,6 +357,66 @@ function runAllTests(htmlFilePath) {
     `Result: ${boldMathPre}`
   );
 
+  // --- SUITE 14: Multi-line LaTeX Matrix & Aligned Environments ---
+  console.log(`\n[Suite 14: Multi-line LaTeX Matrix & Aligned Environments]`);
+  const rawMatrix = [
+    "P =",
+    "\\begin{pmatrix}",
+    "1 - p & p \\\\",
+    "q & 1 - q",
+    "\\end{pmatrix}"
+  ];
+  const matrixPre = sandbox.preprocess(rawMatrix.join("\n"));
+  test("Multi-line pmatrix environment formats cleanly into LaTeX display block with delimiters",
+    matrixPre.includes("\\begin{pmatrix}") && matrixPre.includes("\\end{pmatrix}") && matrixPre.includes("1 - p & p \\\\ q & 1 - q"),
+    `Result: ${matrixPre}`
+  );
+
+  const rawBmatrix = "\\begin{bmatrix}\n0.5 & 1 \\\\\n2 & 3.5\n\\end{bmatrix}";
+  const bmatrixPre = sandbox.preprocess(rawBmatrix);
+  test("Matrix rows containing decimal numbers (e.g. 0.5 & 1) are NOT mangled into markdown headings (###)",
+    !bmatrixPre.includes("### 0.5") && bmatrixPre.includes("\\begin{bmatrix}"),
+    `Result: ${bmatrixPre}`
+  );
+
+  // --- SUITE 15: AI Reasoning <think> Blocks (DeepSeek-R1, o1, Claude 3.7) ---
+  console.log(`\n[Suite 15: AI Reasoning <think> Blocks]`);
+  const thinkInput = "<think>\nLet us consider the loss function.\n\\mathcal{L}_{CE} = -\\sum y_i \\log(p_i)\n</think>\n\nFinal answer is $42$.";
+  const thinkPre = sandbox.preprocess(thinkInput);
+  test("<think> tag is converted into collapsible details think-card",
+    thinkPre.includes("<details class=\"think-card liquid-glass\" open>") && thinkPre.includes("AI Thinking Process") && thinkPre.includes("</details>"),
+    `Result: ${thinkPre}`
+  );
+  test("Formulas inside <think> are not prematurely terminated or swallowed",
+    thinkPre.includes("\\mathcal{L}_{CE}") && thinkPre.includes("Final answer is $42$"),
+    `Result: ${thinkPre}`
+  );
+
+  // --- SUITE 16: Blockquote Math & Admonitions ---
+  console.log(`\n[Suite 16: Blockquote Math & Admonitions]`);
+  const quoteMathInput = "> E = mc^2\n> F = ma";
+  const quoteMathPre = sandbox.preprocess(quoteMathInput);
+  test("Blockquote math formula preserves '> ' quote prefix outside LaTeX delimiters",
+    quoteMathPre.includes("> <div class=\"math-display\">$$\n> E = mc^2") || (quoteMathPre.includes("> <div") && !quoteMathPre.includes("$$\n> E = mc^2\n$$")),
+    `Result: ${quoteMathPre}`
+  );
+
+  test("GitHub Callout styles are supported in CSS",
+    html.includes(".callout-note") && html.includes(".callout-tip") && html.includes(".callout-warning")
+  );
+
+  // --- SUITE 17: Token Estimation & Copy LaTeX Data Attribute ---
+  console.log(`\n[Suite 17: Token Estimation & Copy LaTeX Attribute]`);
+  test("Token estimator is present in HTML telemetry/stats",
+    html.includes("tokenCount") && html.includes("Math.round(chars / 3.8)")
+  );
+  test("Display math containers include data-tex attribute for 1-click clipboard copy",
+    html.includes('data-tex="') && html.includes(".math-copy-btn")
+  );
+  test("Command Palette includes DeepSeek preset and execution handler",
+    html.includes("load-deepseek") && html.includes("DeepSeek-R1")
+  );
+
   console.log(`\n======================================================`);
   console.log(`TEST SUMMARY: TOTAL: ${passed + failed} | PASSED: ${passed} | FAILED: ${failed}`);
   console.log(`======================================================\n`);

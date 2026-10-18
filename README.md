@@ -1,7 +1,7 @@
 # ClarityPad 🖋️📐
 
 > **The Apple-grade Math & Markdown Notebook for AI Outputs (ChatGPT, Claude, Gemini, DeepSeek).**  
-> Built with 2026 Liquid Glass UI, Anti-AI Slop design principles, and an automated 48-assertion test suite. Instantly parses, repairs, and renders messy AI formulas, bare LaTeX commands, and mangled tables into publication-quality notes with live preview and one-click export.
+> Built with 2026 Liquid Glass UI, Anti-AI Slop design principles, and an automated 57-assertion test suite. Instantly parses, repairs, and renders messy AI formulas, bare LaTeX commands, and mangled tables into publication-quality notes with live preview and one-click export.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Design: Liquid Glass](https://img.shields.io/badge/Design-Liquid%20Glass%20UI-blueviolet.svg)](design.md)
@@ -30,14 +30,22 @@ When copying technical explanations, mathematical derivations, or benchmark tabl
   - Ultra-thin material physics: `backdrop-filter: blur(28px) saturate(190%)` with 1px specular light border glow.
   - Strict $H/2$ capsule geometry (`border-radius: 9999px` on all buttons, badges, and selects).
   - macOS 13pt desktop typography standard for crisp, compact readability.
-- 🧠 **Smart AI Math Auto-Detection**:
+- 🧠 **Smart AI Math Auto-Detection & Matrix Recovery**:
   - Automatically wraps bare LaTeX commands (`\alpha`, `\frac`, `\sum`, `\int`, `\operatorname{Attention}`, etc.) in proper display math blocks.
+  - **Multi-Line Matrix & Aligned Systems**: Formats and preserves `pmatrix`, `bmatrix`, `vmatrix`, `array`, `align`, `gather`, and piecewise environments without corrupting rows into headings.
   - Balances norms `||x - y|| <= ||x|| + ||y||` into proper `\lVert` and `\rVert` notation.
   - Intelligently isolates currency amounts (`$15.50 and $3.00`) from math formulas.
   - Formats piecewise `\begin{cases}` into clean LaTeX arrays.
   - Translates unicode mathematical symbols (`→`, `←`, `≥`, `≤`, `≠`, `≈`, `∞`, `·`, `×`) into standard TeX.
-- 📊 **Table Auto-Converter**:
+- 💡 **AI Reasoning `<think>` Blocks & GitHub Callouts**:
+  - Automatically transforms `<think>...</think>` reasoning streams from **DeepSeek-R1**, **o1**, and **Claude 3.7** into collapsible Liquid Glass thinking cards.
+  - Renders standard GitHub / AI admonitions (`[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`) with distinctive color-coded specular badges.
+- 📋 **Interactive Formula & Code Actions**:
+  - **1-Click Copy LaTeX**: Hovering any compiled display math block reveals an instant "Copy LaTeX" button reading from the formula's pristine `data-tex` attribute.
+  - Code blocks include a language indicator badge and an instant "Copy" button.
+- 📊 **Table Auto-Converter & Real-time Token Estimator**:
   - Converts tab-separated or multi-space column data (from 2 to 50+ columns) directly into GFM Markdown tables.
+  - Live character, word, and estimated LLM token counter (`Math.round(chars / 3.8)`).
 - 📐 **The 8-State Matrix**:
   - Interactive coverage for **Empty**, **Loading**, **Success**, **Error (Actionable LaTeX warning)**, **No Results**, **Disabled**, **Confirmation (5s Undo)**, and **Recovery**.
 - ⚡ **Dual-Pane Synchronized Scrolling & Reader Mode**:
@@ -45,15 +53,13 @@ When copying technical explanations, mathematical derivations, or benchmark tabl
   - One-click collapse of the editor (`Cmd / Ctrl + E`) for full-width reading.
 - ⌨️ **Developer-Friendly Keyboard Ergonomics**:
   - `Tab`: Indent 2 spaces (`Shift + Tab` unindents).
-  - `Cmd / Ctrl + K`: Floating Command Palette.
+  - `Cmd / Ctrl + K`: Floating Command Palette with quick preset loading (Deep Learning, DeepSeek-R1).
   - `Cmd / Ctrl + S`: Instant manual save confirmation.
   - `Cmd / Ctrl + Enter`: Force re-render preview.
   - `Cmd / Ctrl + E`: Toggle Reader Mode.
   - `Cmd / Ctrl + B`: Wrap in `**bold**`.
   - `Cmd / Ctrl + I`: Wrap in `*italic*`.
   - `Cmd / Ctrl + M`: Wrap in `$math$`.
-- 📋 **Code Snippets with Syntax Header & One-Click Copy**:
-  - Code blocks include a language indicator badge and an instant "Copy" button.
 - 📤 **One-Click Exports**:
   - **Copy Cleaned Markdown**: Exports standard, cleaned GitHub Flavored Markdown with proper `$$` and `$` delimiters.
   - **Download Markdown (`.md`)**: Save the note directly to your filesystem.
@@ -83,7 +89,7 @@ No build tools, bundlers, or servers required!
 
 ## 🧪 Automated Test Suite
 
-ClarityPad includes an automated test harness with **48 comprehensive tests** testing edge cases in AI outputs, formula detection, table formatting, security, responsive layouts, and Liquid Glass design tokens.
+ClarityPad includes an automated test harness with **57 comprehensive tests** testing edge cases in AI outputs, formula detection, table formatting, security, responsive layouts, and Liquid Glass design tokens.
 
 To run the test suite:
 
@@ -95,7 +101,7 @@ npm test
 node tests/test_claritypad.js
 ```
 
-### Test Coverage Breakdown (48 Tests):
+### Test Coverage Breakdown (57 Tests):
 - **Suite 1: Currency vs Math** — Prevents `$10 ... $5` from becoming broken math.
 - **Suite 2: Math Norms & Formula Delimiters** — Ensures `||x||` balances `\lVert` and `\rVert`.
 - **Suite 3: Code Blocks & Inline Code** — Ensures backticks and fenced code blocks remain untouched.
@@ -109,6 +115,10 @@ node tests/test_claritypad.js
 - **Suite 11: Architecture & Shortcuts** — Tests autosave, print styles, and Tab key indentation.
 - **Suite 12: Liquid Glass UI & 8-State Matrix** — Verifies material physics, H/2 geometry, telemetry bar, and 5-second Undo confirmation toast.
 - **Suite 13: Deterministic Audit Bug Fixes & Heuristics** — Validates math within markdown tables, signed deltas, English prose heuristics ('Set/Let'), preserved user HTML wrappers, 3-column cases environments, safe storage fallback resilience, and bold labels with LaTeX formulas.
+- **Suite 14: Multi-line LaTeX Matrix Environments** — Tests `pmatrix`, `bmatrix`, decimal matrix cells, and prevents row corruption into headings.
+- **Suite 15: AI Reasoning `<think>` Blocks** — Verifies DeepSeek-R1 / o1 collapsible thinking cards and formula containment.
+- **Suite 16: Blockquote Math & Admonitions** — Tests blockquote prefix isolation and GitHub callouts.
+- **Suite 17: Token Estimation & Copy LaTeX Attribute** — Verifies token heuristics, `data-tex` attributes, and Command Palette shortcuts.
 
 ---
 
@@ -117,7 +127,7 @@ node tests/test_claritypad.js
 ```
 claritypad/
 ├── tests/
-│   └── test_claritypad.js    # Automated 48-assertion test suite
+│   └── test_claritypad.js    # Automated 57-assertion test suite
 ├── .gitignore                # Git ignore configuration
 ├── claritypad-release-v4.html# Synchronized release file
 ├── design.md                 # Design system specification (Liquid Glass UI tokens)
