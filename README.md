@@ -1,7 +1,11 @@
+<p align="center">
+  <img src="favicon.svg" width="96" height="96" alt="ClarityPad App Icon" />
+</p>
+
 # ClarityPad 🖋️📐
 
 > **The Apple-grade Math & Markdown Notebook for AI Outputs (ChatGPT, Claude, Gemini, DeepSeek).**  
-> Built with 2026 Liquid Glass UI, Anti-AI Slop design principles, and an automated 57-assertion test suite. Instantly parses, repairs, and renders messy AI formulas, bare LaTeX commands, and mangled tables into publication-quality notes with live preview and one-click export.
+> Built with 2026 Liquid Glass UI, Anti-AI Slop design principles, and an automated 58-assertion test suite. Instantly parses, repairs, and renders messy AI formulas, bare LaTeX commands, and mangled tables into publication-quality notes with live preview and one-click export.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Design: Liquid Glass](https://img.shields.io/badge/Design-Liquid%20Glass%20UI-blueviolet.svg)](design.md)
@@ -89,7 +93,7 @@ No build tools, bundlers, or servers required!
 
 ## 🧪 Automated Test Suite
 
-ClarityPad includes an automated test harness with **57 comprehensive tests** testing edge cases in AI outputs, formula detection, table formatting, security, responsive layouts, and Liquid Glass design tokens.
+ClarityPad includes an automated test harness with **58 comprehensive tests** testing edge cases in AI outputs, formula detection, table formatting, security, responsive layouts, and Liquid Glass design tokens.
 
 To run the test suite:
 
@@ -101,7 +105,7 @@ npm test
 node tests/test_claritypad.js
 ```
 
-### Test Coverage Breakdown (57 Tests):
+### Test Coverage Breakdown (58 Tests):
 - **Suite 1: Currency vs Math** — Prevents `$10 ... $5` from becoming broken math.
 - **Suite 2: Math Norms & Formula Delimiters** — Ensures `||x||` balances `\lVert` and `\rVert`.
 - **Suite 3: Code Blocks & Inline Code** — Ensures backticks and fenced code blocks remain untouched.
@@ -112,7 +116,7 @@ node tests/test_claritypad.js
 - **Suite 8: Comparison Operators** — Preserves `<` and `>` without HTML/DOMPurify stripping.
 - **Suite 9: Unicode Math Translations** — Converts unicode arrows, inequalities, and dots.
 - **Suite 10: Security & XSS** — Verifies DOMPurify sanitization and `rel="noopener noreferrer"`.
-- **Suite 11: Architecture & Shortcuts** — Tests autosave, print styles, and Tab key indentation.
+- **Suite 11: Architecture, Shortcuts & Brand Icon** — Tests autosave, print styles, Tab key indentation, and vector SVG favicon/brand mark.
 - **Suite 12: Liquid Glass UI & Minimalist Architecture** — Verifies material physics, H/2 geometry, distraction-free layout (no debug banners or clutter bars), and 5-second Undo confirmation toast.
 - **Suite 13: Deterministic Audit Bug Fixes & Heuristics** — Validates math within markdown tables, signed deltas, English prose heuristics ('Set/Let'), preserved user HTML wrappers, 3-column cases environments, safe storage fallback resilience, and bold labels with LaTeX formulas.
 - **Suite 14: Multi-line LaTeX Matrix Environments** — Tests `pmatrix`, `bmatrix`, decimal matrix cells, and prevents row corruption into headings.
@@ -127,10 +131,11 @@ node tests/test_claritypad.js
 ```
 claritypad/
 ├── tests/
-│   └── test_claritypad.js    # Automated 57-assertion test suite
+│   └── test_claritypad.js    # Automated 58-assertion test suite
 ├── .gitignore                # Git ignore configuration
 ├── claritypad-release-v4.html# Synchronized release file
 ├── design.md                 # Design system specification (Liquid Glass UI tokens)
+├── favicon.svg               # Apple macOS / iOS style vector SVG app icon
 ├── index.html                # Main application file (Zero build)
 ├── LICENSE                   # MIT License
 ├── package.json              # NPM metadata & test script

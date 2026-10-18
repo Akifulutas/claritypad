@@ -250,6 +250,7 @@ function runAllTests(htmlFilePath) {
   test("Demo sample presets are included", html.includes("loadPresetSample") || html.includes("PRESETS") || html.includes("loadSample"));
   test("Markdown download feature is implemented", html.includes("downloadMarkdown"));
   test("Tab key indentation support in textarea", html.includes("keydown") && (html.includes("Tab") || html.includes("key === 'Tab'")));
+  test("Apple-grade vector SVG brand mark and favicon are defined", html.includes("favicon.svg") && html.includes("cpBg"));
 
   // --- SUITE 12: 2026 Liquid Glass UI & 8-State Matrix Architecture ---
   console.log(`\n[Suite 12: Liquid Glass UI, 8-State Matrix & Anti-AI Slop Rules]`);
